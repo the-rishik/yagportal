@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Bills - NJYAG Bill System</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <header>
+        <h1>My Bills</h1>
+        <nav>
+            <ul>
+                <li><a href="index.html">Home</a></li>
+                <li><a href="index.html#submit-bill">Submit Bill</a></li>
+                <li><a href="my-bills.html">My Bills</a></li>
+                <li><a href="index.html#guidelines">Guidelines</a></li>
+                <li><a href="contact.html">Contact</a></li>
+            </ul>
+        </nav>
+    </header>
+
+    <main>
+        <section class="bills-section">
+            <div class="bills-container">
+                <div class="bills-tabs">
+                    <button class="tab-button active" data-tab="submitted">Submitted Bills</button>
+                    <button class="tab-button" data-tab="drafts">Saved Drafts</button>
+                </div>
+
+                <div class="tab-content active" id="submitted-bills">
+                    <h2>Submitted Bills</h2>
+                    <div class="bills-list" id="submitted-bills-list">
+                        <!-- Bills will be populated by JavaScript -->
+                        <div class="no-bills-message">No submitted bills found.</div>
+                    </div>
+                </div>
+
+                <div class="tab-content" id="draft-bills">
+                    <h2>Saved Drafts</h2>
+                    <div class="bills-list" id="draft-bills-list">
+                        <!-- Drafts will be populated by JavaScript -->
+                        <div class="no-bills-message">No drafts found.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- Bill Preview Modal -->
+        <div class="modal" id="billPreviewModal">
+            <div class="modal-content">
+                <span class="close-button">&times;</span>
+                <h2 id="modal-title">Bill Preview</h2>
+                <div class="bill-preview">
+                    <div class="bill-header">
+                        <h3 id="preview-bill-title"></h3>
+                        <p>Author(s): <span id="preview-author"></span></p>
+                        <p>Delegation: <span id="preview-delegation"></span></p>
+                        <p>Status: <span id="preview-status"></span></p>
+                    </div>
+                    <div class="bill-content">
+                        <pre id="preview-content"></pre>
+                    </div>
+                </div>
+                <div class="modal-actions">
+                    <button id="edit-bill-button" class="edit-button">Edit</button>
+                    <button id="delete-bill-button" class="delete-button">Delete</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer>
+        <p>&copy; 2024 New Jersey Youth and Government. All rights reserved.</p>
+    </footer>
+
+    <script src="js/my-bills.js"></script>
+</body>
+</html> 
