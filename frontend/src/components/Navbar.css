@@ -142,7 +142,7 @@
 
 .user-name {
   font-weight: 600;
-  color: var(--gray-900);
+  color: #fff;
   font-size: 0.875rem;
 }
 
@@ -359,5 +359,9 @@
   .mobile-user-info {
     background: var(--gray-800);
     border-color: var(--gray-600);
+  }
+  
+  .user-name {
+    color: #fff;
   }
 } 

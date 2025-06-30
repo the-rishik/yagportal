@@ -306,4 +306,9 @@
   .login-footer {
     border-top-color: var(--gray-600);
   }
+}
+
+.form-input[type="password"] {
+  -webkit-text-security: disc;
+  color: #111;
 } 

@@ -67,6 +67,11 @@
   border-color: #007bff;
 }
 
+.form-group input[type="password"] {
+  -webkit-text-security: disc;
+  color: #111;
+}
+
 .error-message {
   background-color: #f8d7da;
   color: #721c24;
