@@ -7,6 +7,7 @@ export interface User {
   school?: string;
   createdAt: string;
   updatedAt: string;
+  mustChangePassword?: boolean;
 }
 
 export interface Bill {

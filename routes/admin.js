@@ -138,8 +138,38 @@ router.put('/schools/:id/approve', [auth, admin], async (req, res) => {
         
         school.status = 'approved';
         await school.save();
+
+        // Create user accounts for all people in the school
+        const createdUsers = [];
+        for (const person of school.people) {
+            // Check if user already exists
+            let user = await User.findOne({ email: person.email });
+            if (!user) {
+                // Split name into first and last
+                let firstName = person.name;
+                let lastName = '';
+                if (person.name.includes(' ')) {
+                    const parts = person.name.split(' ');
+                    firstName = parts[0];
+                    lastName = parts.slice(1).join(' ');
+                }
+                // Map role
+                let role = person.type === 'student' ? 'user' : person.type;
+                user = new User({
+                    email: person.email,
+                    password: 'njyag',
+                    firstName,
+                    lastName,
+                    school: school.schoolName,
+                    role,
+                    mustChangePassword: true
+                });
+                await user.save();
+                createdUsers.push(user.email);
+            }
+        }
         
-        res.json({ message: 'School approved successfully', school });
+        res.json({ message: 'School approved successfully', school, createdUsers });
     } catch (error) {
         console.error('Error approving school:', error);
         res.status(500).json({ message: 'Server error' });

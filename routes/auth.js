@@ -22,7 +22,8 @@ router.post('/register', async (req, res) => {
             password,
             firstName,
             lastName,
-            school
+            school,
+            mustChangePassword: password === 'njyag'
         });
 
         await user.save();
@@ -43,7 +44,8 @@ router.post('/register', async (req, res) => {
                 lastName: user.lastName,
                 school: user.school,
                 role: user.role,
-                createdAt: user.createdAt
+                createdAt: user.createdAt,
+                mustChangePassword: user.mustChangePassword
             }
         });
     } catch (error) {
@@ -85,7 +87,8 @@ router.post('/login', async (req, res) => {
                 lastName: user.lastName,
                 school: user.school,
                 role: user.role,
-                createdAt: user.createdAt
+                createdAt: user.createdAt,
+                mustChangePassword: user.mustChangePassword
             }
         });
     } catch (error) {
@@ -109,7 +112,8 @@ router.get('/me', auth, async (req, res) => {
                 lastName: user.lastName,
                 school: user.school,
                 role: user.role,
-                createdAt: user.createdAt
+                createdAt: user.createdAt,
+                mustChangePassword: user.mustChangePassword
             }
         });
     } catch (error) {
@@ -233,6 +237,34 @@ router.put('/my-school', auth, async (req, res) => {
         res.json({ message: 'School updated successfully', school });
     } catch (error) {
         console.error('Error updating school:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Change password for logged-in user
+router.post('/change-password', auth, async (req, res) => {
+    try {
+        const { oldPassword, newPassword, confirmPassword } = req.body;
+        if (!oldPassword || !newPassword || !confirmPassword) {
+            return res.status(400).json({ message: 'All fields are required.' });
+        }
+        if (newPassword !== confirmPassword) {
+            return res.status(400).json({ message: 'New passwords do not match.' });
+        }
+        const user = await User.findById(req.user.userId || req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        const isMatch = await user.comparePassword(oldPassword);
+        if (!isMatch) {
+            return res.status(400).json({ message: 'Old password is incorrect.' });
+        }
+        user.password = newPassword;
+        user.mustChangePassword = false;
+        await user.save();
+        res.json({ message: 'Password changed successfully.' });
+    } catch (error) {
+        console.error('Error changing password:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

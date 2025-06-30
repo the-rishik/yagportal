@@ -103,18 +103,19 @@ const Navbar: React.FC = () => {
         <div className="navbar-user">
           {user ? (
             <div className="user-menu">
-              <div className="user-info">
+              <Link to="/account" className="user-info" style={{ textDecoration: 'none' }}>
                 <div className="user-avatar">
                   <span>{getUserInitials()}</span>
                 </div>
                 <div className="user-details">
-                  <span className="user-name">{getUserDisplayName()}</span>
+                  <span className="user-name">
+                    {getUserDisplayName()}
+                  </span>
                   <span className={`badge badge-${user.role}`}>
                     {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                   </span>
                 </div>
-              </div>
-              
+              </Link>
               <button
                 className="btn btn-secondary logout-btn"
                 onClick={handleLogout}
@@ -165,18 +166,19 @@ const Navbar: React.FC = () => {
               
               {user && (
                 <div className="mobile-user-info">
-                  <div className="mobile-user-details">
+                  <Link to="/account" className="mobile-user-details" style={{ textDecoration: 'none' }} onClick={closeMenu}>
                     <div className="user-avatar">
                       <span>{getUserInitials()}</span>
                     </div>
                     <div>
-                      <div className="user-name">{getUserDisplayName()}</div>
+                      <span className="user-name">
+                        {getUserDisplayName()}
+                      </span>
                       <span className={`badge badge-${user.role}`}>
                         {user.role.charAt(0).toUpperCase() + user.role.slice(1)}
                       </span>
                     </div>
-                  </div>
-                  
+                  </Link>
                   <button
                     className="btn btn-secondary mobile-logout-btn"
                     onClick={handleLogout}

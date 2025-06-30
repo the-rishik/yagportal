@@ -129,6 +129,10 @@ class ApiService {
     const response = await this.api.put<T>(url, data);
     return response.data;
   }
+
+  async changePassword(oldPassword: string, newPassword: string, confirmPassword: string): Promise<any> {
+    return this.post<any>('/auth/change-password', { oldPassword, newPassword, confirmPassword });
+  }
 }
 
 export const apiService = new ApiService();

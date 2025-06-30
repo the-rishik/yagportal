@@ -311,4 +311,8 @@
 .form-input[type="password"] {
   -webkit-text-security: disc;
   color: #111;
+}
+
+.form-input[type="email"] {
+  color: #111;
 } 

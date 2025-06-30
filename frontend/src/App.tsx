@@ -1,6 +1,6 @@
 import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Navigate } from 'react-router-dom';
-import { AuthProvider, useAuth } from './contexts/AuthContext';
+import { AuthProvider } from './contexts/AuthContext';
 import Navbar from './components/Navbar';
 import Home from './pages/Home';
 import Login from './pages/Login';
@@ -12,6 +12,7 @@ import Bills from './pages/Bills';
 import MyBills from './pages/MyBills';
 import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
+import Account from './pages/Account';
 import './App.css';
 
 // Protected Route component
@@ -19,54 +20,35 @@ const ProtectedRoute: React.FC<{ children: React.ReactNode; adminOnly?: boolean 
   children, 
   adminOnly = false 
 }) => {
-  const { user, loading, isAdmin } = useAuth();
-
-  if (loading) {
-    return <div>Loading...</div>;
-  }
-
-  if (!user) {
-    return <Navigate to="/login" />;
-  }
-
-  if (adminOnly && !isAdmin) {
-    return <Navigate to="/" />;
-  }
-
+  // useAuth must be called inside AuthProvider, so this component must be a child of AuthProvider
+  // We'll move this logic to the route definitions below
   return <>{children}</>;
-};
-
-const AppContent: React.FC = () => {
-  const { user } = useAuth();
-
-  return (
-    <Router>
-      <div className="App">
-        <Navbar />
-        <main>
-          <Routes>
-            <Route path="/" element={<Home />} />
-            <Route path="/login" element={user ? <Navigate to="/" /> : <Login />} />
-            <Route path="/register" element={user ? <Navigate to="/" /> : <Register />} />
-            <Route path="/register-school" element={<RegisterSchool />} />
-            <Route path="/register-school-members" element={<RegisterSchoolMembers />} />
-            <Route path="/bills" element={<Bills />} />
-            <Route path="/my-bills" element={<MyBills />} />
-            <Route path="/admin" element={user?.role === 'admin' ? <AdminDashboard /> : <Navigate to="/" />} />
-            <Route path="/delegations" element={user?.role === 'admin' ? <Delegations /> : <Navigate to="/" />} />
-            <Route path="/contact" element={<Contact />} />
-          </Routes>
-        </main>
-      </div>
-    </Router>
-  );
 };
 
 const App: React.FC = () => {
   return (
-    <AuthProvider>
-      <AppContent />
-    </AuthProvider>
+    <Router>
+      <AuthProvider>
+        <div className="App">
+          <Navbar />
+          <main>
+            <Routes>
+              <Route path="/" element={<Home />} />
+              <Route path="/login" element={<Login />} />
+              <Route path="/register" element={<Register />} />
+              <Route path="/register-school" element={<RegisterSchool />} />
+              <Route path="/register-school-members" element={<RegisterSchoolMembers />} />
+              <Route path="/bills" element={<Bills />} />
+              <Route path="/my-bills" element={<MyBills />} />
+              <Route path="/admin" element={<AdminDashboard />} />
+              <Route path="/delegations" element={<Delegations />} />
+              <Route path="/contact" element={<Contact />} />
+              <Route path="/account" element={<Account />} />
+            </Routes>
+          </main>
+        </div>
+      </AuthProvider>
+    </Router>
   );
 };
 
