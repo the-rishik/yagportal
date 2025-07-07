@@ -5,6 +5,7 @@ const Bill = require('../models/Bill');
 const auth = require('../middleware/auth');
 const admin = require('../middleware/admin');
 const School = require('../models/School');
+const { sendBulkWelcomeEmails } = require('../services/emailService');
 
 // Get all users (admin only)
 router.get('/users', [auth, admin], async (req, res) => {
@@ -141,6 +142,8 @@ router.put('/schools/:id/approve', [auth, admin], async (req, res) => {
 
         // Create user accounts for all people in the school
         const createdUsers = [];
+        const usersToEmail = [];
+        
         for (const person of school.people) {
             // Check if user already exists
             let user = await User.findOne({ email: person.email });
@@ -166,10 +169,35 @@ router.put('/schools/:id/approve', [auth, admin], async (req, res) => {
                 });
                 await user.save();
                 createdUsers.push(user.email);
+                
+                // Add to email list
+                usersToEmail.push({
+                    email: user.email,
+                    firstName: user.firstName,
+                    school: school.schoolName
+                });
             }
         }
         
-        res.json({ message: 'School approved successfully', school, createdUsers });
+        // Send welcome emails to newly created users
+        let emailResults = [];
+        if (usersToEmail.length > 0) {
+            try {
+                const portalUrl = process.env.PORTAL_URL || 'http://localhost:3001';
+                emailResults = await sendBulkWelcomeEmails(usersToEmail, portalUrl);
+                console.log('Email results:', emailResults);
+            } catch (error) {
+                console.error('Error sending welcome emails:', error);
+                // Don't fail the approval if emails fail
+            }
+        }
+        
+        res.json({ 
+            message: 'School approved successfully', 
+            school, 
+            createdUsers,
+            emailResults 
+        });
     } catch (error) {
         console.error('Error approving school:', error);
         res.status(500).json({ message: 'Server error' });
