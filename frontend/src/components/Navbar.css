@@ -21,6 +21,7 @@
 .navbar-brand {
   display: flex;
   align-items: center;
+  flex-shrink: 0;
 }
 
 .navbar-logo {
@@ -46,6 +47,8 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
+  justify-content: center;
+  flex: 1;
 }
 
 .nav-link {
@@ -95,6 +98,7 @@
   display: flex;
   align-items: center;
   gap: 1rem;
+  flex-shrink: 0;
 }
 
 .user-menu {

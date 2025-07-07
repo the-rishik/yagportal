@@ -53,11 +53,15 @@ const Navbar: React.FC = () => {
   ];
 
   // Determine which navigation items to show based on user role
-  let allItems = navItems; // Default for regular users (students)
-  if (user?.role === 'advisor') {
+  let allItems = navItems;
+  if (!user) {
+    allItems = [
+      { to: '/', label: 'Home' },
+      { to: '/contact', label: 'Contact' },
+    ];
+  } else if (user?.role === 'advisor') {
     allItems = advisorItems;
   } else if (user?.role === 'admin') {
-    // For admins, include all items except "My Bills" plus admin items
     allItems = [
       { to: '/', label: 'Home' },
       { to: '/bills', label: 'Bills' },
@@ -65,7 +69,6 @@ const Navbar: React.FC = () => {
       ...adminItems
     ];
   } else if (user?.role === 'staff') {
-    // For staff, include all items except "My Bills"
     allItems = [
       { to: '/', label: 'Home' },
       { to: '/bills', label: 'Bills' },

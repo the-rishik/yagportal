@@ -154,7 +154,7 @@
 /* Stats Section */
 .stats-section {
   padding: 4rem 0;
-  background: white;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
 }
 
 .stats-grid {
@@ -165,11 +165,11 @@
 }
 
 .stat-card {
-  background: white;
+  background: linear-gradient(135deg, var(--primary-600) 0%, var(--primary-700) 100%);
   padding: 2rem;
   border-radius: var(--radius-xl);
-  box-shadow: var(--shadow-md);
-  border: 1px solid var(--gray-200);
+  box-shadow: none;
+  border: none;
   text-align: center;
   transition: all var(--transition-normal);
 }
@@ -182,14 +182,14 @@
 .stat-value {
   font-size: 2.5rem;
   font-weight: 700;
-  color: #000;
+  color: #fff;
   line-height: 1;
   margin-bottom: 0.5rem;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: #000;
+  color: #fff;
   font-weight: 500;
 }
 

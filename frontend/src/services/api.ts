@@ -114,7 +114,7 @@ class ApiService {
     return response.data;
   }
 
-  // Generic HTTP methods for delegations
+  // Generic HTTP methods
   async get<T>(url: string): Promise<T> {
     const response = await this.api.get<T>(url);
     return response.data;
