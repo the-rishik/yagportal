@@ -45,7 +45,7 @@ const sendWelcomeEmail = async (userEmail, firstName, schoolName, portalUrl = pr
               <p style="margin: 5px 0; color: #374151;"><strong>Email:</strong> ${userEmail}</p>
               <p style="margin: 5px 0; color: #374151;"><strong>Password:</strong> njyag</p>
               <p style="margin: 15px 0 0 0; color: #dc2626; font-size: 14px;">
-                <strong>Important:</strong> Please change your password after your first login for security.
+                <strong>Important:</strong> You will be prompted to change your password after your first login for security.
               </p>
             </div>
             
