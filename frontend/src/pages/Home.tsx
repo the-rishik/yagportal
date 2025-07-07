@@ -405,8 +405,8 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                The official platform for New Jersey Youth and Government bill submission and management.
-                Create, submit, and track legislative proposals with ease.
+                The official platform for New Jersey Youth and Government.
+                Please create an account or login to get started.
               </motion.p>
               <motion.div 
                 className="hero-actions"
@@ -416,7 +416,7 @@ const Home: React.FC = () => {
               >
                 <div className="flex gap-4">
                   <Link to="/login" className="btn">
-                    <span>Get Started</span>
+                    <span>Login</span>
                   </Link>
                   <Link to="/register" className="btn btn-secondary">
                     <span>Register</span>

@@ -80,11 +80,11 @@ const Login: React.FC = () => {
             variants={itemVariants}
           >
             <div className="logo-container">
-              <div className="logo-text">YAG Bills</div>
+              <div className="logo-text">NJYAG Portal</div>
             </div>
             <h1 className="login-title">Welcome Back</h1>
             <p className="login-subtitle">
-              Sign in to your YAG Bills account to continue
+              Sign in to your NJYAG Portal account to continue
             </p>
           </motion.div>
 
