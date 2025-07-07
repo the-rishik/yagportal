@@ -73,6 +73,7 @@
   line-height: 1.1;
   margin-bottom: 1.5rem;
   color: var(--gray-900);
+  text-align: center;
 }
 
 .gradient-text {
@@ -87,12 +88,14 @@
   color: var(--gray-600);
   margin-bottom: 2rem;
   line-height: 1.6;
+  text-align: center;
 }
 
 .hero-actions {
   display: flex;
   gap: 1rem;
   flex-wrap: wrap;
+  justify-content: center;
 }
 
 .hero-visual {
@@ -158,6 +161,7 @@
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
   gap: 2rem;
+  justify-items: center;
 }
 
 .stat-card {
@@ -178,14 +182,14 @@
 .stat-value {
   font-size: 2.5rem;
   font-weight: 700;
-  color: var(--gray-900);
+  color: #000;
   line-height: 1;
   margin-bottom: 0.5rem;
 }
 
 .stat-label {
   font-size: 0.875rem;
-  color: var(--gray-600);
+  color: #000;
   font-weight: 500;
 }
 
@@ -421,12 +425,8 @@
     border-color: var(--gray-700);
   }
 
-  .stat-value {
-    color: var(--gray-100);
-  }
-
-  .stat-label {
-    color: var(--gray-400);
+  .stat-value, .stat-label {
+    color: #000 !important;
   }
 
   .features-section {
@@ -778,4 +778,18 @@
 .edit-school-btn:active {
   transform: translateY(0);
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.center-hero {
+  display: flex !important;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  height: 60vh;
+}
+
+.hero-section .container.center-hero {
+  grid-template-columns: none;
+  gap: 0;
 } 

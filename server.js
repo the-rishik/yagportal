@@ -2,6 +2,9 @@ const express = require('express');
 const mongoose = require('mongoose');
 const cors = require('cors');
 const dotenv = require('dotenv');
+const Bill = require('./models/Bill');
+const User = require('./models/User');
+const School = require('./models/School');
 
 // Load environment variables
 dotenv.config();
@@ -18,6 +21,25 @@ app.use(express.static('public'));
 app.use('/api/auth', require('./routes/auth'));
 app.use('/api/bills', require('./routes/bills'));
 app.use('/api/admin', require('./routes/admin'));
+
+// Stats endpoint for counts
+app.get('/api/stats', async (req, res) => {
+    try {
+        // Count active bills (status: submitted, reviewed, approved)
+        const activeBillStatuses = ['submitted', 'reviewed', 'approved'];
+        const activeBillsCount = await Bill.countDocuments({ status: { $in: activeBillStatuses } });
+        const usersCount = await User.countDocuments();
+        const schoolsCount = await School.countDocuments();
+        res.json({
+            activeBills: activeBillsCount,
+            registeredUsers: usersCount,
+            schools: schoolsCount
+        });
+    } catch (error) {
+        console.error('Error fetching stats:', error);
+        res.status(500).json({ message: 'Error fetching stats' });
+    }
+});
 
 // Error handling middleware
 app.use((err, req, res, next) => {

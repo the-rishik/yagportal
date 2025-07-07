@@ -14,6 +14,9 @@ const Home: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [stats, setStats] = useState<{ activeBills: number; registeredUsers: number; schools: number } | null>(null);
+  const [statsLoading, setStatsLoading] = useState(false);
+  const [statsError, setStatsError] = useState<string | null>(null);
 
   useEffect(() => {
     // Check for success message from navigation
@@ -29,6 +32,16 @@ const Home: React.FC = () => {
       loadSchoolStatus();
     } else {
       setLoading(false);
+    }
+  }, [user]);
+
+  useEffect(() => {
+    if (!user) {
+      setStatsLoading(true);
+      apiService.get<{ activeBills: number; registeredUsers: number; schools: number }>('/stats')
+        .then(setStats)
+        .catch(() => setStatsError('Failed to load stats'))
+        .finally(() => setStatsLoading(false));
     }
   }, [user]);
 
@@ -363,13 +376,6 @@ const Home: React.FC = () => {
     }
   ];
 
-  const stats = [
-    { label: "Active Bills", value: "150+" },
-    { label: "Registered Users", value: "500+" },
-    { label: "Schools", value: "25+" },
-    { label: "Success Rate", value: "85%" }
-  ];
-
   return (
     <>
       <motion.div 
@@ -383,7 +389,7 @@ const Home: React.FC = () => {
           className="hero-section"
           variants={itemVariants}
         >
-          <div className="container">
+          <div className="container center-hero">
             <div className="hero-content">
               <motion.h1 
                 className="hero-title"
@@ -391,7 +397,7 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.2 }}
               >
-                Welcome to <span className="gradient-text">YAG Bills</span>
+                Welcome to <span className="gradient-text">the NJYAG Portal</span>
               </motion.h1>
               <motion.p 
                 className="hero-subtitle"
@@ -402,106 +408,52 @@ const Home: React.FC = () => {
                 The official platform for New Jersey Youth and Government bill submission and management.
                 Create, submit, and track legislative proposals with ease.
               </motion.p>
-              
               <motion.div 
                 className="hero-actions"
                 initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                {user ? (
-                  <div className="flex gap-4">
-                    <Link to="/bills" className="btn">
-                      <span>View Bills</span>
-                    </Link>
-                    <Link to="/my-bills" className="btn btn-secondary">
-                      <span>My Bills</span>
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="flex gap-4">
-                    <Link to="/login" className="btn">
-                      <span>Get Started</span>
-                    </Link>
-                    <Link to="/register" className="btn btn-secondary">
-                      <span>Register</span>
-                    </Link>
-                  </div>
-                )}
+                <div className="flex gap-4">
+                  <Link to="/login" className="btn">
+                    <span>Get Started</span>
+                  </Link>
+                  <Link to="/register" className="btn btn-secondary">
+                    <span>Register</span>
+                  </Link>
+                </div>
               </motion.div>
             </div>
-            
-            <motion.div 
-              className="hero-visual"
-              initial={{ opacity: 0, scale: 0.8 }}
-              animate={{ opacity: 1, scale: 1 }}
-              transition={{ duration: 1, delay: 0.8 }}
-            >
-              <div className="hero-cards">
-                <div className="hero-card card-1">
-                  <span>Bill Submission</span>
-                </div>
-                <div className="hero-card card-2">
-                  <span>Collaboration</span>
-                </div>
-                <div className="hero-card card-3">
-                  <span>Management</span>
-                </div>
-              </div>
-            </motion.div>
           </div>
         </motion.section>
 
-        {/* Features Section */}
-        <motion.section 
-          className="features-section"
-          variants={itemVariants}
-        >
-          <div className="container">
-            <div className="section-header">
-              <h2>Platform Features</h2>
-              <p>Everything you need to manage your YAG experience</p>
-            </div>
-            
-            <div className="features-grid">
-              {features.map((feature, index) => (
-                <motion.div 
-                  key={index}
-                  className="feature-card"
-                  variants={cardVariants}
-                  whileHover="hover"
-                >
-                  <div 
-                    className="feature-icon"
-                    style={{ backgroundColor: feature.color }}
-                  >
-                    <span>{feature.title.charAt(0)}</span>
-                  </div>
-                  <h3>{feature.title}</h3>
-                  <p>{feature.description}</p>
-                </motion.div>
-              ))}
-            </div>
-          </div>
-        </motion.section>
-
-        {/* Stats Section */}
+        {/* Stats Section (no features, no success rate) */}
         <motion.section 
           className="stats-section"
           variants={itemVariants}
         >
           <div className="container">
             <div className="stats-grid">
-              {stats.map((stat, index) => (
-                <motion.div 
-                  key={index}
-                  className="stat-card"
-                  variants={cardVariants}
-                >
-                  <div className="stat-value">{stat.value}</div>
-                  <div className="stat-label">{stat.label}</div>
-                </motion.div>
-              ))}
+              {statsLoading ? (
+                <div>Loading stats...</div>
+              ) : statsError ? (
+                <div style={{ color: 'red' }}>{statsError}</div>
+              ) : stats ? (
+                <>
+                  <motion.div className="stat-card" variants={cardVariants}>
+                    <div className="stat-value">{stats.activeBills}</div>
+                    <div className="stat-label">Active Bills</div>
+                  </motion.div>
+                  <motion.div className="stat-card" variants={cardVariants}>
+                    <div className="stat-value">{stats.registeredUsers}</div>
+                    <div className="stat-label">Registered Users</div>
+                  </motion.div>
+                  <motion.div className="stat-card" variants={cardVariants}>
+                    <div className="stat-value">{stats.schools}</div>
+                    <div className="stat-label">Schools</div>
+                  </motion.div>
+                </>
+              ) : null}
             </div>
           </div>
         </motion.section>
