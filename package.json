@@ -10,7 +10,10 @@
     "dev:full": "concurrently \"npm run dev\" \"npm run frontend\"",
     "build": "cd frontend && npm run build",
     "install:all": "npm install && cd frontend && npm install",
-    "create-admin": "node scripts/createAdmin.js"
+    "create-admin": "node scripts/createAdmin.js",
+    "test": "jest",
+    "test:watch": "jest --watch",
+    "test:coverage": "jest --coverage"
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
@@ -22,7 +25,10 @@
     "nodemailer": "^7.0.5"
   },
   "devDependencies": {
+    "@types/jest": "^30.0.0",
     "concurrently": "^8.2.2",
-    "nodemon": "^2.0.22"
+    "jest": "^30.0.4",
+    "nodemon": "^2.0.22",
+    "supertest": "^7.1.3"
   }
 }

@@ -25,8 +25,8 @@ app.use('/api/admin', require('./routes/admin'));
 // Stats endpoint for counts
 app.get('/api/stats', async (req, res) => {
     try {
-        // Count active bills (status: submitted, reviewed, approved)
-        const activeBillStatuses = ['submitted', 'reviewed', 'approved'];
+        // Count active bills (status: submitted, under_review, approved)
+        const activeBillStatuses = ['submitted', 'under_review', 'approved'];
         const activeBillsCount = await Bill.countDocuments({ status: { $in: activeBillStatuses } });
         const usersCount = await User.countDocuments();
         const schoolsCount = await School.countDocuments();
@@ -51,21 +51,26 @@ app.use((err, req, res, next) => {
 const MONGODB_URI = 'mongodb://localhost:27017/njyag';
 const PORT = process.env.PORT || 3000;
 
-mongoose.connect(MONGODB_URI, {
-    useNewUrlParser: true,
-    useUnifiedTopology: true
-})
-.then(() => {
-    console.log('Connected to MongoDB');
-    // Start server only after MongoDB connects
-    app.listen(PORT, '0.0.0.0', () => {
-        console.log(`Server is running on port ${PORT}`);
-        console.log(`Try accessing the server at:`);
-        console.log(`- http://localhost:${PORT}`);
-        console.log(`- http://127.0.0.1:${PORT}`);
+// Only connect to MongoDB and start server if this file is run directly
+if (require.main === module) {
+    mongoose.connect(MONGODB_URI, {
+        useNewUrlParser: true,
+        useUnifiedTopology: true
+    })
+    .then(() => {
+        console.log('Connected to MongoDB');
+        // Start server only after MongoDB connects
+        app.listen(PORT, '0.0.0.0', () => {
+            console.log(`Server is running on port ${PORT}`);
+            console.log(`Try accessing the server at:`);
+            console.log(`- http://localhost:${PORT}`);
+            console.log(`- http://127.0.0.1:${PORT}`);
+        });
+    })
+    .catch(err => {
+        console.error('MongoDB connection error:', err);
+        process.exit(1); // Exit if MongoDB connection fails
     });
-})
-.catch(err => {
-    console.error('MongoDB connection error:', err);
-    process.exit(1); // Exit if MongoDB connection fails
-}); 
+}
+
+module.exports = app; 
