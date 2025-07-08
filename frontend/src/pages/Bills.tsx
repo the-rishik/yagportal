@@ -54,7 +54,8 @@ const Bills: React.FC = () => {
     const matchesSearch = bill.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          bill.content.toLowerCase().includes(searchTerm.toLowerCase()) ||
                          bill.author.firstName.toLowerCase().includes(searchTerm.toLowerCase()) ||
-                         bill.author.lastName.toLowerCase().includes(searchTerm.toLowerCase());
+                         bill.author.lastName.toLowerCase().includes(searchTerm.toLowerCase()) ||
+                         bill.author.email.toLowerCase().includes(searchTerm.toLowerCase());
     
     const matchesCategory = selectedCategory === 'all' || bill.category === selectedCategory;
     const matchesStatus = selectedStatus === 'all' || bill.status === selectedStatus;
@@ -107,12 +108,6 @@ const Bills: React.FC = () => {
               Browse and search through all submitted legislative bills
             </p>
           </div>
-          
-          {user && (
-            <button className="btn new-bill-btn">
-              <span>Submit New Bill</span>
-            </button>
-          )}
         </div>
 
         {/* Search and Filters */}
@@ -120,7 +115,7 @@ const Bills: React.FC = () => {
           <div className="search-container">
             <input
               type="text"
-              placeholder="Search bills by title, content, or author..."
+              placeholder="Search bills by title, content, author name, or email..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
               className="search-input"
@@ -196,14 +191,17 @@ const Bills: React.FC = () => {
             >
               <div className="bill-header">
                 <h3 className="bill-title">{bill.title}</h3>
-                <span className={`badge badge-${bill.status}`}>
-                  {bill.status.charAt(0).toUpperCase() + bill.status.slice(1)}
+                <span className={`status-badge status-${bill.status}`}>
+                  {bill.status.charAt(0).toUpperCase() + bill.status.slice(1).replace('_', ' ')}
                 </span>
               </div>
 
               <div className="bill-meta">
                 <div className="meta-item">
                   <span>Author: {bill.author.firstName} {bill.author.lastName}</span>
+                </div>
+                <div className="meta-item">
+                  <span>Email: {bill.author.email}</span>
                 </div>
                 <div className="meta-item">
                   <span>Date: {new Date(bill.createdAt).toLocaleDateString()}</span>
@@ -273,13 +271,17 @@ const Bills: React.FC = () => {
                     <span>{selectedBill.author.firstName} {selectedBill.author.lastName}</span>
                   </div>
                   <div className="meta-row">
+                    <span className="meta-label">Email:</span>
+                    <span>{selectedBill.author.email}</span>
+                  </div>
+                  <div className="meta-row">
                     <span className="meta-label">Category:</span>
                     <span>{selectedBill.category.replace('_', ' ')}</span>
                   </div>
                   <div className="meta-row">
                     <span className="meta-label">Status:</span>
-                    <span className={`badge badge-${selectedBill.status}`}>
-                      {selectedBill.status.charAt(0).toUpperCase() + selectedBill.status.slice(1)}
+                    <span className={`status-badge status-${selectedBill.status}`}>
+                      {selectedBill.status.charAt(0).toUpperCase() + selectedBill.status.slice(1).replace('_', ' ')}
                     </span>
                   </div>
                   <div className="meta-row">

@@ -45,12 +45,6 @@
   font-size: 1.125rem;
 }
 
-.new-bill-btn {
-  flex-shrink: 0;
-  padding: 0.875rem 1.5rem;
-  font-size: 0.875rem;
-}
-
 /* Search and Filters */
 .search-filters {
   display: flex;
@@ -181,6 +175,9 @@
   transition: all var(--transition-normal);
   position: relative;
   overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 }
 
 .bill-card::before {
@@ -215,7 +212,7 @@
 .bill-title {
   font-size: 1.25rem;
   font-weight: 600;
-  color: var(--gray-900);
+  color: #000000;
   margin: 0;
   line-height: 1.4;
   flex: 1;
@@ -232,12 +229,12 @@
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: var(--gray-600);
+  color: #000000;
   font-size: 0.875rem;
 }
 
 .bill-category {
-  margin-bottom: 1rem;
+  margin: 1rem 0;
 }
 
 .category-badge {
@@ -251,19 +248,69 @@
   text-transform: capitalize;
 }
 
-.bill-excerpt {
-  color: var(--gray-700);
+/* Status Badge Styles */
+.status-badge {
+  display: inline-block;
+  padding: 0.25rem 0.75rem;
+  border-radius: var(--radius-full);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #000000 !important;
+  transition: all var(--transition-normal);
+}
+
+.status-badge:hover {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-sm);
+}
+
+.status-draft {
+  background-color: #e9ecef;
+  color: #000000 !important;
+}
+
+.status-submitted {
+  background-color: #cce5ff;
+  color: #000000 !important;
+}
+
+.status-under_review {
+  background-color: #fff3cd;
+  color: #000000 !important;
+}
+
+.status-approved {
+  background-color: #d4edda;
+  color: #000000 !important;
+}
+
+.status-rejected {
+  background-color: #f8d7da;
+  color: #000000 !important;
+}
+
+.bill-card .bill-excerpt,
+.bill-card p.bill-excerpt,
+.bills-grid .bill-card .bill-excerpt {
+  color: #000000 !important;
+  color: black !important;
   line-height: 1.6;
-  margin-bottom: 1.5rem;
+  margin: 1rem 0;
   display: -webkit-box;
   -webkit-line-clamp: 3;
   -webkit-box-orient: vertical;
   overflow: hidden;
+  flex-grow: 1;
+  min-height: 0;
 }
 
 .bill-actions {
   display: flex;
   justify-content: flex-end;
+  margin-top: auto;
+  padding-top: 1rem;
 }
 
 .view-btn {
@@ -564,4 +611,4 @@
   .bill-content p {
     color: var(--gray-300);
   }
-} 
+} /* Cache bust: Mon Jul  7 21:20:56 EDT 2025 */
