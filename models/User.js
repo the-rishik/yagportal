@@ -23,6 +23,26 @@ const userSchema = new mongoose.Schema({
         required: true,
         trim: true
     },
+    middleName: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    pronouns: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    namePronunciation: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    phoneNumber: {
+        type: String,
+        required: true,
+        trim: true
+    },
     school: {
         type: String,
         required: true,
@@ -38,6 +58,10 @@ const userSchema = new mongoose.Schema({
         default: Date.now
     },
     mustChangePassword: {
+        type: Boolean,
+        default: false,
+    },
+    mustCompleteProfile: {
         type: Boolean,
         default: false,
     },

@@ -114,6 +114,27 @@ class ApiService {
     return response.data;
   }
 
+  // School management endpoints
+  async getSchools(): Promise<any[]> {
+    const response = await this.api.get<any[]>('/admin/schools');
+    return response.data;
+  }
+
+  async approveSchool(schoolId: string): Promise<any> {
+    const response = await this.api.put<any>(`/admin/schools/${schoolId}/approve`);
+    return response.data;
+  }
+
+  async updateSchool(schoolId: string, schoolData: any): Promise<any> {
+    const response = await this.api.put<any>(`/admin/schools/${schoolId}`, schoolData);
+    return response.data;
+  }
+
+  async deleteSchool(schoolId: string): Promise<any> {
+    const response = await this.api.delete<any>(`/admin/schools/${schoolId}`);
+    return response.data;
+  }
+
   // Generic HTTP methods
   async get<T>(url: string): Promise<T> {
     const response = await this.api.get<T>(url);
@@ -130,8 +151,26 @@ class ApiService {
     return response.data;
   }
 
+  async updateProfile(profileData: {
+    firstName: string;
+    lastName: string;
+    middleName?: string;
+    pronouns?: string;
+    namePronunciation?: string;
+    phoneNumber: string;
+  }): Promise<{ user: User; message: string }> {
+    const response = await this.api.patch<{ user: User; message: string }>('/auth/update-profile', profileData);
+    return response.data;
+  }
+
   async changePassword(oldPassword: string, newPassword: string, confirmPassword: string): Promise<any> {
     return this.post<any>('/auth/change-password', { oldPassword, newPassword, confirmPassword });
+  }
+
+  // Get approved schools for registration
+  async getApprovedSchools(): Promise<{ schoolName: string }[]> {
+    const response = await this.api.get<{ schoolName: string }[]>('/auth/approved-schools');
+    return response.data;
   }
 }
 

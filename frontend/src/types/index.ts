@@ -3,11 +3,16 @@ export interface User {
   email: string;
   firstName: string;
   lastName: string;
+  middleName?: string;
+  pronouns?: string;
+  namePronunciation?: string;
+  phoneNumber: string;
   role: 'user' | 'advisor' | 'staff' | 'admin';
   school?: string;
   createdAt: string;
   updatedAt: string;
   mustChangePassword?: boolean;
+  mustCompleteProfile?: boolean;
 }
 
 export interface Bill {
@@ -56,6 +61,10 @@ export interface RegisterData {
   password: string;
   firstName: string;
   lastName: string;
+  middleName?: string;
+  pronouns?: string;
+  namePronunciation?: string;
+  phoneNumber: string;
   school: string;
 }
 

@@ -14,6 +14,7 @@ const AdminDashboard: React.FC = () => {
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showRoleModal, setShowRoleModal] = useState(false);
   const [newRole, setNewRole] = useState<'user' | 'advisor' | 'staff' | 'admin'>('user');
+  const [schools, setSchools] = useState<any[]>([]);
 
   useEffect(() => {
     loadData();
@@ -22,12 +23,14 @@ const AdminDashboard: React.FC = () => {
   const loadData = async () => {
     try {
       setLoading(true);
-      const [usersResponse, billsResponse] = await Promise.all([
+      const [usersResponse, billsResponse, schoolsResponse] = await Promise.all([
         apiService.get<User[]>('/admin/users'),
-        apiService.get<Bill[]>('/admin/bills')
+        apiService.get<Bill[]>('/admin/bills'),
+        apiService.getSchools()
       ]);
       setUsers(usersResponse);
       setBills(billsResponse);
+      setSchools(schoolsResponse);
     } catch (err) {
       setError('Failed to load data');
       console.error('Error loading data:', err);
@@ -40,7 +43,7 @@ const AdminDashboard: React.FC = () => {
     if (!selectedUser || !newRole) return;
 
     try {
-      await apiService.put(`/admin/users/${selectedUser._id}/role`, { role: newRole });
+      await apiService.changeUserRole(selectedUser._id, { role: newRole });
       setUsers(users.map(u => u._id === selectedUser._id ? { ...u, role: newRole } : u));
       setShowRoleModal(false);
       setSelectedUser(null);
@@ -61,6 +64,17 @@ const AdminDashboard: React.FC = () => {
     setShowRoleModal(false);
     setSelectedUser(null);
     setNewRole('user');
+  };
+
+  const handleApproveSchool = async (schoolId: string) => {
+    try {
+      await apiService.approveSchool(schoolId);
+      // Reload data to get updated school status
+      await loadData();
+    } catch (err) {
+      setError('Failed to approve school');
+      console.error('Error approving school:', err);
+    }
   };
 
   const getRoleBadgeColor = (role: string) => {
@@ -131,27 +145,40 @@ const AdminDashboard: React.FC = () => {
               <h3>Students</h3>
               <p>{users.filter(u => u.role === 'user').length}</p>
             </div>
+            <div className="stat-card">
+              <h3>Pending Schools</h3>
+              <p>{schools.filter(s => s.status === 'pending').length}</p>
+            </div>
           </div>
 
           {/* User Management */}
-          <section className="section">
+          <section className="section admin-section">
             <h2>User Management</h2>
             <div className="table-container">
               <table className="admin-table">
                 <thead>
                   <tr>
-                    <th>Name</th>
+                    <th>Full Name</th>
                     <th>Email</th>
+                    <th>Phone</th>
                     <th>School</th>
                     <th>Role</th>
+                    <th>Pronouns</th>
+                    <th>Pronunciation</th>
+                    <th>Created</th>
                     <th>Actions</th>
                   </tr>
                 </thead>
                 <tbody>
                   {users.map((user) => (
                     <tr key={user._id}>
-                      <td>{user.firstName} {user.lastName}</td>
+                      <td>
+                        <div className="user-name">
+                          <strong>{user.firstName} {user.middleName ? user.middleName + ' ' : ''}{user.lastName}</strong>
+                        </div>
+                      </td>
                       <td>{user.email}</td>
+                      <td>{user.phoneNumber || 'N/A'}</td>
                       <td>{user.school || 'N/A'}</td>
                       <td>
                         <span 
@@ -161,6 +188,9 @@ const AdminDashboard: React.FC = () => {
                           {user.role}
                         </span>
                       </td>
+                      <td>{user.pronouns || 'N/A'}</td>
+                      <td>{user.namePronunciation || 'N/A'}</td>
+                      <td>{new Date(user.createdAt).toLocaleDateString()}</td>
                       <td>
                         <button 
                           className="btn btn-small"
@@ -177,7 +207,7 @@ const AdminDashboard: React.FC = () => {
           </section>
 
           {/* Bill Management */}
-          <section className="section">
+          <section className="section admin-section">
             <h2>Bill Management</h2>
             <div className="table-container">
               <table className="admin-table">
@@ -207,6 +237,53 @@ const AdminDashboard: React.FC = () => {
                       </td>
                       <td>{bill.category}</td>
                       <td>{new Date(bill.createdAt).toLocaleDateString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          </section>
+
+          {/* School Management */}
+          <section className="section admin-section">
+            <h2>School Management</h2>
+            <div className="table-container">
+              <table className="admin-table">
+                <thead>
+                  <tr>
+                    <th>School Name</th>
+                    <th>Students</th>
+                    <th>People</th>
+                    <th>Status</th>
+                    <th>Registered By</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {schools.map((school) => (
+                    <tr key={school._id}>
+                      <td>{school.schoolName}</td>
+                      <td>{school.numberOfStudents}</td>
+                      <td>{school.people.length}</td>
+                      <td>
+                        <span 
+                          className="status-badge"
+                          style={{ backgroundColor: school.status === 'approved' ? 'var(--success-500)' : 'var(--warning-500)' }}
+                        >
+                          {school.status}
+                        </span>
+                      </td>
+                      <td>{school.registeredBy?.firstName} {school.registeredBy?.lastName}</td>
+                      <td>
+                        {school.status === 'pending' && (
+                          <button 
+                            className="btn btn-small btn-primary"
+                            onClick={() => handleApproveSchool(school._id)}
+                          >
+                            Approve
+                          </button>
+                        )}
+                      </td>
                     </tr>
                   ))}
                 </tbody>

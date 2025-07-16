@@ -99,6 +99,13 @@
   padding: 1rem;
   text-align: left;
   border-bottom: 1px solid #eee;
+  white-space: nowrap;
+}
+
+.admin-table td {
+  white-space: normal;
+  word-wrap: break-word;
+  max-width: 200px;
 }
 
 .admin-table th {
@@ -118,6 +125,15 @@
   color: #007bff;
   max-width: 200px;
   word-wrap: break-word;
+}
+
+.user-name {
+  font-weight: 600;
+  color: #333;
+}
+
+.user-name strong {
+  color: #007bff;
 }
 
 .category {
@@ -310,12 +326,17 @@
   }
   
   .admin-table {
-    font-size: 0.9rem;
+    font-size: 0.8rem;
   }
   
   .admin-table th,
   .admin-table td {
-    padding: 0.5rem;
+    padding: 0.5rem 0.25rem;
+    max-width: 120px;
+  }
+  
+  .admin-table th {
+    font-size: 0.7rem;
   }
   
   .bill-title {

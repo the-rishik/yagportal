@@ -14,6 +14,11 @@ const Delegations: React.FC = () => {
   const [activeTab, setActiveTab] = useState<'pending' | 'approved'>('pending');
   const [selectedSchool, setSelectedSchool] = useState<School | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
+  const [approvingSchools, setApprovingSchools] = useState<Set<string>>(new Set());
+  const [successMessage, setSuccessMessage] = useState<string | null>(null);
+  const [deletingSchoolId, setDeletingSchoolId] = useState<string | null>(null);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [isDeleting, setIsDeleting] = useState(false);
 
   useEffect(() => {
     loadSchools();
@@ -30,11 +35,62 @@ const Delegations: React.FC = () => {
 
   const approveSchool = async (schoolId: string) => {
     try {
-      await apiService.put(`/admin/schools/${schoolId}/approve`);
+      console.log('Approving school:', schoolId);
+      setApprovingSchools(prev => new Set(prev).add(schoolId));
+      setError(null);
+      
+      const result = await apiService.approveSchool(schoolId);
+      console.log('Approval result:', result);
+      
+      // Show success message
+      setSuccessMessage(`School approved successfully! ${result.createdUsers?.length || 0} user accounts created.`);
+      
       // Reload schools to get updated status
-      loadSchools();
-    } catch (error) {
+      await loadSchools();
+      
+      // Clear success message after 5 seconds
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (error: any) {
       console.error('Error approving school:', error);
+      console.error('Error response:', error.response);
+      setError(error.response?.data?.message || 'Failed to approve school');
+      
+      // Clear error after 5 seconds
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setApprovingSchools(prev => {
+        const newSet = new Set(prev);
+        newSet.delete(schoolId);
+        return newSet;
+      });
+    }
+  };
+
+  const deleteSchool = async (schoolId: string) => {
+    try {
+      console.log('Starting delete for school:', schoolId);
+      console.log('Current user:', user);
+      console.log('User role:', user?.role);
+      setIsDeleting(true);
+      setError(null);
+      
+      const result = await apiService.deleteSchool(schoolId);
+      console.log('Delete result:', result);
+      
+      setSuccessMessage('School and all associated users deleted successfully.');
+      await loadSchools();
+      setTimeout(() => setSuccessMessage(null), 5000);
+    } catch (error: any) {
+      console.error('Delete error:', error);
+      console.error('Error response:', error.response);
+      console.error('Error status:', error.response?.status);
+      console.error('Error data:', error.response?.data);
+      setError(error.response?.data?.message || 'Failed to delete school');
+      setTimeout(() => setError(null), 5000);
+    } finally {
+      setIsDeleting(false);
+      setDeletingSchoolId(null);
+      setShowDeleteConfirm(false);
     }
   };
 
@@ -51,6 +107,27 @@ const Delegations: React.FC = () => {
 
   const pendingSchools = schools.filter(school => school.status === 'pending');
   const approvedSchools = schools.filter(school => school.status === 'approved');
+
+  // Confirmation modal JSX
+  const renderDeleteConfirmModal = () => {
+    if (!deletingSchoolId) return null;
+    const school = schools.find(s => s._id === deletingSchoolId);
+    if (!school) return null;
+    return (
+      <div className="modal-overlay">
+        <div className="modal">
+          <h2>Confirm Delete</h2>
+          <p>Are you sure you want to delete <strong>{school.schoolName}</strong> and <strong>all users associated with this school</strong>? This action cannot be undone.</p>
+          <div className="modal-actions">
+            <button className="btn btn-secondary" onClick={() => setDeletingSchoolId(null)} disabled={isDeleting}>Cancel</button>
+            <button className="btn btn-danger" onClick={() => deleteSchool(school._id)} disabled={isDeleting}>
+              {isDeleting ? 'Deleting...' : 'Delete'}
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  };
 
   return (
     <motion.div 
@@ -69,6 +146,29 @@ const Delegations: React.FC = () => {
           <h1>Delegations</h1>
           <p>Manage school registrations and approvals</p>
         </motion.div>
+
+        {/* Success and Error Messages */}
+        {successMessage && (
+          <motion.div 
+            className="success-message"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {successMessage}
+          </motion.div>
+        )}
+        
+        {error && (
+          <motion.div 
+            className="error-message"
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.3 }}
+          >
+            {error}
+          </motion.div>
+        )}
 
         <motion.div 
           className="tabs"
@@ -147,14 +247,21 @@ const Delegations: React.FC = () => {
                     <button 
                       className="approve-btn"
                       onClick={() => approveSchool(school._id)}
+                      disabled={approvingSchools.has(school._id)}
                     >
-                      Approve School
+                      {approvingSchools.has(school._id) ? 'Approving...' : 'Approve School'}
                     </button>
                     <button 
                       className="edit-btn"
                       onClick={() => handleEditSchool(school)}
                     >
                       Edit
+                    </button>
+                    <button 
+                      className="delete-btn"
+                      onClick={() => setDeletingSchoolId(school._id)}
+                    >
+                      Delete
                     </button>
                   </div>
                 </motion.div>
@@ -213,6 +320,12 @@ const Delegations: React.FC = () => {
                   >
                     Edit
                   </button>
+                  <button 
+                    className="delete-btn"
+                    onClick={() => setDeletingSchoolId(school._id)}
+                  >
+                    Delete
+                  </button>
                 </div>
               </motion.div>
             ))
@@ -231,6 +344,7 @@ const Delegations: React.FC = () => {
         onSave={handleEditSave}
         isAdmin={true}
       />
+      {renderDeleteConfirmModal()}
     </motion.div>
   );
 };

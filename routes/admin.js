@@ -22,7 +22,7 @@ router.get('/users', [auth, admin], async (req, res) => {
 router.get('/bills', [auth, admin], async (req, res) => {
     try {
         const bills = await Bill.find()
-            .populate('author', 'firstName lastName email school')
+            .populate('author', 'firstName lastName middleName pronouns namePronunciation phoneNumber email school')
             .sort({ createdAt: -1 });
         console.log('Sending bills:', bills);
         res.json(bills);
@@ -46,7 +46,7 @@ router.get('/search', [auth, admin], async (req, res) => {
                 { title: searchRegex },
                 { content: searchRegex }
             ]
-        }).populate('author', 'firstName lastName email school');
+        }).populate('author', 'firstName lastName middleName pronouns namePronunciation phoneNumber email school');
 
         res.json(bills);
     } catch (error) {
@@ -111,7 +111,7 @@ router.post('/promote/:userId', [auth, admin], async (req, res) => {
 router.get('/schools', [auth, admin], async (req, res) => {
     try {
         const schools = await School.find()
-            .populate('registeredBy', 'firstName lastName email')
+            .populate('registeredBy', 'firstName lastName middleName pronouns namePronunciation phoneNumber email')
             .sort({ createdAt: -1 });
         
         console.log('Admin requesting schools, found:', schools.length);
@@ -145,37 +145,54 @@ router.put('/schools/:id/approve', [auth, admin], async (req, res) => {
         const usersToEmail = [];
         
         for (const person of school.people) {
-            // Check if user already exists
-            let user = await User.findOne({ email: person.email });
-            if (!user) {
-                // Split name into first and last
-                let firstName = person.name;
-                let lastName = '';
-                if (person.name.includes(' ')) {
-                    const parts = person.name.split(' ');
-                    firstName = parts[0];
-                    lastName = parts.slice(1).join(' ');
+            try {
+                // Check if user already exists
+                let user = await User.findOne({ email: person.email });
+                if (!user) {
+                    // Split name into first and last
+                    let firstName = person.name;
+                    let lastName = 'User'; // Default lastName if none provided
+                    if (person.name.includes(' ')) {
+                        const parts = person.name.split(' ');
+                        firstName = parts[0];
+                        lastName = parts.slice(1).join(' ');
+                    }
+                    // Map role - ensure valid role values
+                    let role = 'user'; // default
+                    if (person.type === 'student') {
+                        role = 'user';
+                    } else if (person.type === 'advisor') {
+                        role = 'advisor';
+                    }
+                    
+                    console.log(`Creating user: ${firstName} ${lastName} (${person.email}) with role: ${role}`);
+                    
+                    user = new User({
+                        email: person.email,
+                        password: 'njyag',
+                        firstName,
+                        lastName,
+                        phoneNumber: 'TBD', // Default phone number for auto-created users
+                        school: school.schoolName,
+                        role,
+                        mustChangePassword: true,
+                        mustCompleteProfile: true
+                    });
+                    await user.save();
+                    createdUsers.push(user.email);
+                    
+                    // Add to email list
+                    usersToEmail.push({
+                        email: user.email,
+                        firstName: user.firstName,
+                        school: school.schoolName
+                    });
+                } else {
+                    console.log(`User already exists: ${person.email}`);
                 }
-                // Map role
-                let role = person.type === 'student' ? 'user' : person.type;
-                user = new User({
-                    email: person.email,
-                    password: 'njyag',
-                    firstName,
-                    lastName,
-                    school: school.schoolName,
-                    role,
-                    mustChangePassword: true
-                });
-                await user.save();
-                createdUsers.push(user.email);
-                
-                // Add to email list
-                usersToEmail.push({
-                    email: user.email,
-                    firstName: user.firstName,
-                    school: school.schoolName
-                });
+            } catch (error) {
+                console.error(`Error creating user for ${person.email}:`, error);
+                throw error; // Re-throw to stop the approval process
             }
         }
         
@@ -231,6 +248,24 @@ router.put('/schools/:id', [auth, admin], async (req, res) => {
         res.json({ message: 'School updated successfully', school });
     } catch (error) {
         console.error('Error updating school:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Delete a school and all associated users (admin only)
+router.delete('/schools/:id', [auth, admin], async (req, res) => {
+    try {
+        const school = await School.findById(req.params.id);
+        if (!school) {
+            return res.status(404).json({ message: 'School not found' });
+        }
+        // Delete all users whose school matches this school's name
+        const deletedUsers = await User.deleteMany({ school: school.schoolName });
+        // Delete the school
+        await school.deleteOne();
+        res.json({ message: 'School and associated users deleted successfully', deletedUsersCount: deletedUsers.deletedCount });
+    } catch (error) {
+        console.error('Error deleting school:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

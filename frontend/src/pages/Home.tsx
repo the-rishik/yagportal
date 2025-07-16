@@ -4,6 +4,7 @@ import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
 import EditSchoolModal from '../components/EditSchoolModal';
+import DateCounter from '../components/DateCounter';
 import { School } from '../types';
 import './Home.css';
 
@@ -82,6 +83,7 @@ const Home: React.FC = () => {
             </div>
           </div>
         </div>
+        <DateCounter />
       </motion.div>
     );
   }
@@ -101,6 +103,7 @@ const Home: React.FC = () => {
               <div className="loading">Loading...</div>
             </div>
           </div>
+          <DateCounter />
         </motion.div>
       );
     }
@@ -141,6 +144,7 @@ const Home: React.FC = () => {
               </motion.div>
             </div>
           </div>
+          <DateCounter />
         </motion.div>
       );
     }
@@ -177,6 +181,7 @@ const Home: React.FC = () => {
                 </motion.div>
               </div>
             </div>
+            <DateCounter />
           </motion.div>
         );
       } else if (school.status === 'approved') {
@@ -251,6 +256,7 @@ const Home: React.FC = () => {
               </div>
             </div>
 
+            <DateCounter />
             {/* Edit School Modal for Advisor */}
             <EditSchoolModal
               school={school}
@@ -301,6 +307,7 @@ const Home: React.FC = () => {
           </div>
         </div>
 
+        <DateCounter />
         {/* Edit School Modal for Advisor */}
         <EditSchoolModal
           school={school}
@@ -405,8 +412,11 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                The official platform for New Jersey Youth and Government.
-                Please create an account or login to get started.
+                {user && user.role === 'user' ? (
+                  'Welcome to the official platform for New Jersey Youth and Government. Submit your bills and track their progress.'
+                ) : (
+                  'The official platform for New Jersey Youth and Government. Please create an account or login to get started.'
+                )}
               </motion.p>
               <motion.div 
                 className="hero-actions"
@@ -414,18 +424,29 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                <div className="flex gap-4">
-                  <Link to="/login" className="btn">
-                    <span>Login</span>
-                  </Link>
-                  <Link to="/register" className="btn btn-secondary">
-                    <span>Register</span>
-                  </Link>
-                </div>
+                {user && user.role === 'user' ? (
+                  <div className="flex gap-4">
+                    <Link to="/my-bills" className="btn btn-primary">
+                      <span>Submit Bill</span>
+                    </Link>
+                  </div>
+                ) : (
+                  <div className="flex gap-4">
+                    <Link to="/login" className="btn">
+                      <span>Login</span>
+                    </Link>
+                    <Link to="/register" className="btn btn-secondary">
+                      <span>Register</span>
+                    </Link>
+                  </div>
+                )}
               </motion.div>
             </div>
           </div>
         </motion.section>
+
+        {/* Date Counter Section */}
+        <DateCounter />
 
         {/* Stats Section (no features, no success rate) */}
         <motion.section 

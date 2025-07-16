@@ -4,35 +4,38 @@
 
 /* Admin Home Styles */
 .admin-home {
-  min-height: 100vh;
+  min-height: unset;
   background-color: #f8f9fa;
 }
 
 .admin-home .container {
-  max-width: 1200px;
-  margin: 0 auto;
-  padding: 2rem;
+  max-width: 100%;
+  margin: 0;
+  padding: 0;
 }
 
 .admin-home h1 {
   color: #333;
-  margin-bottom: 2rem;
+  margin-bottom: 0.5rem;
   text-align: center;
+  font-size: 1.1rem;
+  font-weight: 600;
 }
 
 .welcome-message {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 60vh;
+  display: block;
+  min-height: 0;
   text-align: center;
+  margin: 0;
+  padding: 0;
 }
 
 .welcome-message h1 {
-  font-size: 2.5rem;
+  font-size: 0.9rem;
   color: #333;
   margin: 0;
   font-weight: 600;
+  line-height: 1;
 }
 
 /* Hero Section */

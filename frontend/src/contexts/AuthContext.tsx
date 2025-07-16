@@ -9,6 +9,7 @@ interface AuthContextType {
   login: (email: string, password: string) => Promise<void>;
   register: (userData: any) => Promise<void>;
   logout: () => void;
+  refreshUser: () => Promise<void>;
   isAdmin: boolean;
   isAdvisor: boolean;
   isStaff: boolean;
@@ -86,6 +87,17 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     setUser(null);
   };
 
+  const refreshUser = async () => {
+    try {
+      const currentUser = await apiService.getCurrentUser();
+      setUser(currentUser);
+    } catch (error) {
+      console.error('Failed to refresh user:', error);
+      localStorage.removeItem('token');
+      setUser(null);
+    }
+  };
+
   const isAdmin = user?.role === 'admin';
   const isAdvisor = user?.role === 'advisor';
   const isStaff = user?.role === 'staff';
@@ -98,6 +110,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     login,
     register,
     logout,
+    refreshUser,
     isAdmin,
     isAdvisor,
     isStaff,

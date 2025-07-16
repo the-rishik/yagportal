@@ -1,6 +1,7 @@
 const express = require('express');
 const router = express.Router();
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
 const User = require('../models/User');
 const auth = require('../middleware/auth');
 const School = require('../models/School');
@@ -8,7 +9,7 @@ const School = require('../models/School');
 // Register a new user
 router.post('/register', async (req, res) => {
     try {
-        const { email, password, firstName, lastName, school } = req.body;
+        const { email, password, firstName, lastName, middleName, pronouns, namePronunciation, phoneNumber, school } = req.body;
 
         // Check if user already exists
         let user = await User.findOne({ email });
@@ -22,6 +23,10 @@ router.post('/register', async (req, res) => {
             password,
             firstName,
             lastName,
+            middleName,
+            pronouns,
+            namePronunciation,
+            phoneNumber,
             school,
             mustChangePassword: password === 'njyag'
         });
@@ -42,10 +47,15 @@ router.post('/register', async (req, res) => {
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                middleName: user.middleName,
+                pronouns: user.pronouns,
+                namePronunciation: user.namePronunciation,
+                phoneNumber: user.phoneNumber,
                 school: user.school,
                 role: user.role,
                 createdAt: user.createdAt,
-                mustChangePassword: user.mustChangePassword
+                mustChangePassword: user.mustChangePassword,
+                mustCompleteProfile: user.mustCompleteProfile
             }
         });
     } catch (error) {
@@ -85,10 +95,15 @@ router.post('/login', async (req, res) => {
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                middleName: user.middleName,
+                pronouns: user.pronouns,
+                namePronunciation: user.namePronunciation,
+                phoneNumber: user.phoneNumber,
                 school: user.school,
                 role: user.role,
                 createdAt: user.createdAt,
-                mustChangePassword: user.mustChangePassword
+                mustChangePassword: user.mustChangePassword,
+                mustCompleteProfile: user.mustCompleteProfile
             }
         });
     } catch (error) {
@@ -110,10 +125,15 @@ router.get('/me', auth, async (req, res) => {
                 email: user.email,
                 firstName: user.firstName,
                 lastName: user.lastName,
+                middleName: user.middleName,
+                pronouns: user.pronouns,
+                namePronunciation: user.namePronunciation,
+                phoneNumber: user.phoneNumber,
                 school: user.school,
                 role: user.role,
                 createdAt: user.createdAt,
-                mustChangePassword: user.mustChangePassword
+                mustChangePassword: user.mustChangePassword,
+                mustCompleteProfile: user.mustCompleteProfile
             }
         });
     } catch (error) {
@@ -241,6 +261,70 @@ router.put('/my-school', auth, async (req, res) => {
     }
 });
 
+// Get approved schools for registration (public endpoint)
+router.get('/approved-schools', async (req, res) => {
+    try {
+        const schools = await School.find({ status: 'approved' })
+            .select('schoolName')
+            .sort({ schoolName: 1 });
+        
+        res.json(schools);
+    } catch (error) {
+        console.error('Error fetching approved schools:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Update user profile information
+router.patch('/update-profile', auth, async (req, res) => {
+    try {
+        const { firstName, lastName, middleName, pronouns, namePronunciation, phoneNumber } = req.body;
+        
+        // Validate required fields
+        if (!firstName || !lastName || !phoneNumber) {
+            return res.status(400).json({ message: 'First name, last name, and phone number are required.' });
+        }
+        
+        const user = await User.findById(req.user.userId || req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+        
+        // Update user fields
+        user.firstName = firstName;
+        user.lastName = lastName;
+        user.middleName = middleName || '';
+        user.pronouns = pronouns || '';
+        user.namePronunciation = namePronunciation || '';
+        user.phoneNumber = phoneNumber;
+        user.mustCompleteProfile = false; // Mark profile as complete
+        
+        await user.save();
+        
+        res.json({ 
+            message: 'Profile updated successfully.',
+            user: {
+                _id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                middleName: user.middleName,
+                pronouns: user.pronouns,
+                namePronunciation: user.namePronunciation,
+                phoneNumber: user.phoneNumber,
+                school: user.school,
+                role: user.role,
+                createdAt: user.createdAt,
+                mustChangePassword: user.mustChangePassword,
+                mustCompleteProfile: user.mustCompleteProfile
+            }
+        });
+    } catch (error) {
+        console.error('Error updating profile:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
 // Change password for logged-in user
 router.post('/change-password', auth, async (req, res) => {
     try {
@@ -259,9 +343,14 @@ router.post('/change-password', auth, async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Old password is incorrect.' });
         }
-        user.password = newPassword;
+        // Hash the password manually and update only the specific fields
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(newPassword, salt);
+        
+        // Update password and mustChangePassword flag
+        user.password = hashedPassword;
         user.mustChangePassword = false;
-        await user.save();
+        await user.save({ validateBeforeSave: false });
         res.json({ message: 'Password changed successfully.' });
     } catch (error) {
         console.error('Error changing password:', error);

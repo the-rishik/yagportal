@@ -34,7 +34,7 @@ router.get('/', auth, async (req, res) => {
         if (school) query.school = school;
 
         const bills = await Bill.find(query)
-            .populate('author', 'firstName lastName email school')
+            .populate('author', 'firstName lastName middleName pronouns namePronunciation phoneNumber email school')
             .sort({ createdAt: -1 });
 
         res.json(bills);
@@ -58,8 +58,8 @@ router.get('/my-bills', auth, async (req, res) => {
 router.get('/:id', auth, async (req, res) => {
     try {
         const bill = await Bill.findById(req.params.id)
-            .populate('author', 'firstName lastName email school')
-            .populate('comments.author', 'firstName lastName');
+            .populate('author', 'firstName lastName middleName pronouns namePronunciation phoneNumber email school')
+            .populate('comments.author', 'firstName lastName middleName pronouns namePronunciation phoneNumber');
             
         if (!bill) {
             return res.status(404).json({ message: 'Bill not found' });
