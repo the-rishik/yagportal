@@ -43,39 +43,13 @@ const Account: React.FC = () => {
     }
   }, [user]);
 
-  const handlePasswordChange = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setSuccess('');
-    setError('');
-    setLoading(true);
-    try {
-      await apiService.changePassword(oldPassword, newPassword, confirmPassword);
-      setSuccess('Password changed successfully.');
-      setOldPassword('');
-      setNewPassword('');
-      setConfirmPassword('');
-      
-      // Refresh user data to update mustChangePassword flag
-      await refreshUser();
-      
-      // Redirect to home page after successful password change
-      setTimeout(() => {
-        navigate('/');
-      }, 1500); // Wait 1.5 seconds to show success message
-    } catch (err: any) {
-      setError(err.response?.data?.message || 'Failed to change password.');
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const handleProfileUpdate = async (e: React.FormEvent) => {
     e.preventDefault();
     setSuccess('');
     setError('');
     setLoading(true);
     try {
-      const result = await apiService.updateProfile({
+      const result = await apiService.updateAccount({
         firstName,
         lastName,
         middleName,
@@ -94,6 +68,36 @@ const Account: React.FC = () => {
       }, 1500); // Wait 1.5 seconds to show success message
     } catch (err: any) {
       setError(err.response?.data?.message || 'Failed to update profile.');
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handlePasswordChange = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setSuccess('');
+    setError('');
+    setLoading(true);
+    try {
+      await apiService.updateAccount({
+        oldPassword,
+        newPassword,
+        confirmPassword
+      });
+      setSuccess('Password changed successfully.');
+      setOldPassword('');
+      setNewPassword('');
+      setConfirmPassword('');
+      
+      // Refresh user data to update mustChangePassword flag
+      await refreshUser();
+      
+      // Redirect to home page after successful password change
+      setTimeout(() => {
+        navigate('/');
+      }, 1500); // Wait 1.5 seconds to show success message
+    } catch (err: any) {
+      setError(err.response?.data?.message || 'Failed to change password.');
     } finally {
       setLoading(false);
     }
@@ -237,6 +241,81 @@ const Account: React.FC = () => {
         <p><strong>School:</strong> {user?.school}</p>
         {user?.pronouns && <p><strong>Pronouns:</strong> {user.pronouns}</p>}
         {user?.namePronunciation && <p><strong>Name Pronunciation:</strong> {user.namePronunciation}</p>}
+      </div>
+      
+      <div className="update-profile-section">
+        <h3>Update Profile Information</h3>
+        <form onSubmit={handleProfileUpdate} className="update-profile-form">
+          {success && <div className="success-message">{success}</div>}
+          {error && <div className="error-message">{error}</div>}
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>First Name *</label>
+              <input
+                type="text"
+                value={firstName}
+                onChange={e => setFirstName(e.target.value)}
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Last Name *</label>
+              <input
+                type="text"
+                value={lastName}
+                onChange={e => setLastName(e.target.value)}
+                required
+              />
+            </div>
+          </div>
+          
+          <div className="form-group">
+            <label>Middle Name (Optional)</label>
+            <input
+              type="text"
+              value={middleName}
+              onChange={e => setMiddleName(e.target.value)}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>Phone Number *</label>
+            <input
+              type="tel"
+              value={phoneNumber}
+              onChange={e => setPhoneNumber(e.target.value)}
+              required
+            />
+          </div>
+          
+          <div className="form-row">
+            <div className="form-group">
+              <label>Pronouns (Optional)</label>
+              <input
+                type="text"
+                value={pronouns}
+                onChange={e => setPronouns(e.target.value)}
+                placeholder="e.g., he/him, she/her, they/them"
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Name Pronunciation (Optional)</label>
+              <input
+                type="text"
+                value={namePronunciation}
+                onChange={e => setNamePronunciation(e.target.value)}
+                placeholder="e.g., REE-shik"
+              />
+            </div>
+          </div>
+          
+          <button type="submit" className="btn btn-primary" disabled={loading}>
+            {loading ? 'Updating...' : 'Update Profile'}
+          </button>
+        </form>
       </div>
       
       <div className="change-password-section">

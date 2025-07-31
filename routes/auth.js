@@ -343,17 +343,108 @@ router.post('/change-password', auth, async (req, res) => {
         if (!isMatch) {
             return res.status(400).json({ message: 'Old password is incorrect.' });
         }
-        // Hash the password manually and update only the specific fields
+        
+        // Hash the password manually
         const salt = await bcrypt.genSalt(10);
         const hashedPassword = await bcrypt.hash(newPassword, salt);
         
-        // Update password and mustChangePassword flag
-        user.password = hashedPassword;
-        user.mustChangePassword = false;
-        await user.save({ validateBeforeSave: false });
+        // Update password and mustChangePassword flag using findByIdAndUpdate
+        await User.findByIdAndUpdate(
+            user._id,
+            {
+                password: hashedPassword,
+                mustChangePassword: false
+            },
+            { new: true, runValidators: false }
+        );
+        
         res.json({ message: 'Password changed successfully.' });
     } catch (error) {
         console.error('Error changing password:', error);
+        res.status(500).json({ message: 'Server error' });
+    }
+});
+
+// Update account information - allows updating any profile field
+router.patch('/account', auth, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.userId || req.user._id);
+        if (!user) {
+            return res.status(404).json({ message: 'User not found.' });
+        }
+
+        const {
+            firstName,
+            lastName,
+            middleName,
+            pronouns,
+            namePronunciation,
+            phoneNumber,
+            school,
+            oldPassword,
+            newPassword,
+            confirmPassword
+        } = req.body;
+
+        // Handle password change if provided
+        if (oldPassword && newPassword && confirmPassword) {
+            if (newPassword !== confirmPassword) {
+                return res.status(400).json({ message: 'New passwords do not match.' });
+            }
+            
+            const isMatch = await user.comparePassword(oldPassword);
+            if (!isMatch) {
+                return res.status(400).json({ message: 'Old password is incorrect.' });
+            }
+            
+            // Hash the new password
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(newPassword, salt);
+            user.password = hashedPassword;
+            user.mustChangePassword = false;
+        }
+
+        // Update profile fields if provided
+        if (firstName !== undefined) user.firstName = firstName;
+        if (lastName !== undefined) user.lastName = lastName;
+        if (middleName !== undefined) user.middleName = middleName;
+        if (pronouns !== undefined) user.pronouns = pronouns;
+        if (namePronunciation !== undefined) user.namePronunciation = namePronunciation;
+        if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
+        if (school !== undefined) user.school = school;
+
+        // Validate required fields
+        if (!user.firstName || !user.lastName || !user.phoneNumber) {
+            return res.status(400).json({ message: 'First name, last name, and phone number are required.' });
+        }
+
+        // Mark profile as complete if all required fields are present
+        if (user.firstName && user.lastName && user.phoneNumber) {
+            user.mustCompleteProfile = false;
+        }
+
+        await user.save();
+
+        res.json({
+            message: 'Account updated successfully.',
+            user: {
+                _id: user._id,
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                middleName: user.middleName,
+                pronouns: user.pronouns,
+                namePronunciation: user.namePronunciation,
+                phoneNumber: user.phoneNumber,
+                school: user.school,
+                role: user.role,
+                createdAt: user.createdAt,
+                mustChangePassword: user.mustChangePassword,
+                mustCompleteProfile: user.mustCompleteProfile
+            }
+        });
+    } catch (error) {
+        console.error('Error updating account:', error);
         res.status(500).json({ message: 'Server error' });
     }
 });

@@ -167,6 +167,22 @@ class ApiService {
     return this.post<any>('/auth/change-password', { oldPassword, newPassword, confirmPassword });
   }
 
+  // New comprehensive account update method
+  async updateAccount(accountData: {
+    firstName?: string;
+    lastName?: string;
+    middleName?: string;
+    pronouns?: string;
+    namePronunciation?: string;
+    phoneNumber?: string;
+    oldPassword?: string;
+    newPassword?: string;
+    confirmPassword?: string;
+  }): Promise<{ user: User; message: string }> {
+    const response = await this.api.patch<{ user: User; message: string }>('/auth/account', accountData);
+    return response.data;
+  }
+
   // Get approved schools for registration
   async getApprovedSchools(): Promise<{ schoolName: string }[]> {
     const response = await this.api.get<{ schoolName: string }[]>('/auth/approved-schools');

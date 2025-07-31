@@ -31,6 +31,52 @@
   margin-top: 2rem;
 }
 
+.update-profile-section {
+  margin-top: 2rem;
+  margin-bottom: 2rem;
+}
+
+.update-profile-section h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: #222;
+}
+
+.update-profile-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+
+.update-profile-form .form-group input[type="text"],
+.update-profile-form .form-group input[type="tel"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #f9fafb;
+  color: #111;
+}
+
+.update-profile-form .form-group input[type="text"]:focus,
+.update-profile-form .form-group input[type="tel"]:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+}
+
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+}
+
+.form-row .form-group {
+  margin: 0;
+}
+
 .change-password-section h3 {
   font-size: 1.25rem;
   font-weight: 600;
