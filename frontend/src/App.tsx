@@ -10,6 +10,7 @@ import RegisterSchoolMembers from './pages/RegisterSchoolMembers';
 import Delegations from './pages/Delegations';
 import Bills from './pages/Bills';
 import MyBills from './pages/MyBills';
+import CreateBill from './pages/CreateBill';
 import AdminDashboard from './pages/AdminDashboard';
 import Contact from './pages/Contact';
 import Account from './pages/Account';
@@ -39,6 +40,7 @@ const App: React.FC = () => {
               <Route path="/register-school" element={<RegisterSchool />} />
               <Route path="/register-school-members" element={<RegisterSchoolMembers />} />
               <Route path="/bills" element={<Bills />} />
+              <Route path="/create-bill" element={<CreateBill />} />
               <Route path="/my-bills" element={<MyBills />} />
               <Route path="/admin" element={<AdminDashboard />} />
               <Route path="/delegations" element={<Delegations />} />

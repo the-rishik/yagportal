@@ -15,6 +15,11 @@ const billSchema = new mongoose.Schema({
         type: String,
         required: true
     },
+    enactmentClause: {
+        type: String,
+        required: true,
+        trim: true
+    },
     status: {
         type: String,
         enum: ['draft', 'submitted', 'under_review', 'approved', 'rejected'],
@@ -23,7 +28,7 @@ const billSchema = new mongoose.Schema({
     category: {
         type: String,
         required: true,
-        enum: ['education', 'environment', 'health', 'public_safety', 'other']
+        enum: ['civil_rights', 'finance', 'human_rights', 'education']
     },
     school: {
         type: String,

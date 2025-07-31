@@ -36,7 +36,7 @@ describe('Auth Routes', () => {
       expect(response.body.user.email).toBe(userData.email);
       expect(response.body.user.firstName).toBe(userData.firstName);
       expect(response.body.user.lastName).toBe(userData.lastName);
-      expect(response.body.user.role).toBe('user');
+      expect(response.body.user.role).toBe('Student');
       expect(response.body.user.mustChangePassword).toBe(false);
     });
 

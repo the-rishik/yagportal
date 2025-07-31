@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import { Bill } from '../types';
@@ -7,6 +8,7 @@ import './MyBills.css';
 
 const MyBills: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -91,7 +93,7 @@ const MyBills: React.FC = () => {
             </p>
           </div>
           
-          <button className="btn new-bill-btn">
+          <button className="btn new-bill-btn" onClick={() => navigate('/create-bill')}>
             <span>Submit New Bill</span>
           </button>
         </div>
@@ -152,7 +154,7 @@ const MyBills: React.FC = () => {
           <div className="empty-state">
             <h3>No bills found</h3>
             <p>You haven't submitted any bills yet. Start by creating your first bill!</p>
-            <button className="btn">
+            <button className="btn" onClick={() => navigate('/create-bill')}>
               <span>Submit Your First Bill</span>
             </button>
           </div>
@@ -211,6 +213,9 @@ const MyBills: React.FC = () => {
                 <div className="bill-content">
                   <h3>Bill Content</h3>
                   <p>{selectedBill.content}</p>
+                  
+                  <h3>Enactment Clause</h3>
+                  <p>{selectedBill.enactmentClause}</p>
                 </div>
               </div>
             </motion.div>

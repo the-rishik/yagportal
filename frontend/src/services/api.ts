@@ -158,6 +158,14 @@ class ApiService {
     pronouns?: string;
     namePronunciation?: string;
     phoneNumber: string;
+    foodAllergies?: string;
+    tshirtSize: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
+    emergencyContact: {
+      name: string;
+      relationship: string;
+      phoneNumber: string;
+      email: string;
+    };
   }): Promise<{ user: User; message: string }> {
     const response = await this.api.patch<{ user: User; message: string }>('/auth/update-profile', profileData);
     return response.data;
@@ -175,6 +183,14 @@ class ApiService {
     pronouns?: string;
     namePronunciation?: string;
     phoneNumber?: string;
+    foodAllergies?: string;
+    tshirtSize?: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
+    emergencyContact?: {
+      name: string;
+      relationship: string;
+      phoneNumber: string;
+      email: string;
+    };
     oldPassword?: string;
     newPassword?: string;
     confirmPassword?: string;

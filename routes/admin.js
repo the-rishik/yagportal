@@ -62,7 +62,7 @@ router.post('/change-role/:userId', [auth, admin], async (req, res) => {
         const { userId } = req.params;
 
         // Validate role
-        const validRoles = ['user', 'advisor', 'staff', 'admin'];
+        const validRoles = ['Student', 'advisor', 'staff', 'admin'];
         if (!validRoles.includes(role)) {
             return res.status(400).json({ message: 'Invalid role' });
         }
@@ -158,9 +158,9 @@ router.put('/schools/:id/approve', [auth, admin], async (req, res) => {
                         lastName = parts.slice(1).join(' ');
                     }
                     // Map role - ensure valid role values
-                    let role = 'user'; // default
+                    let role = 'Student'; // default
                     if (person.type === 'student') {
-                        role = 'user';
+                        role = 'Student';
                     } else if (person.type === 'advisor') {
                         role = 'advisor';
                     }

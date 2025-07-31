@@ -44,7 +44,7 @@ describe('Navbar Component', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
-        role: 'user'
+        role: 'Student'
       },
       logout: jest.fn(),
       loading: false
@@ -86,7 +86,7 @@ describe('Navbar Component', () => {
         firstName: 'John',
         lastName: 'Doe',
         email: 'john@example.com',
-        role: 'user'
+        role: 'Student'
       },
       logout: mockLogout,
       loading: false

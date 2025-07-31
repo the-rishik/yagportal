@@ -17,7 +17,7 @@ router.post('/register', async (req, res) => {
             return res.status(400).json({ message: 'User already exists' });
         }
 
-        // Create new user
+        // Create new user with default values for required fields
         user = new User({
             email,
             password,
@@ -28,6 +28,13 @@ router.post('/register', async (req, res) => {
             namePronunciation,
             phoneNumber,
             school,
+            tshirtSize: 'M', // Default t-shirt size
+            emergencyContact: {
+                name: `${firstName} ${lastName} Emergency Contact`,
+                relationship: 'Emergency Contact',
+                phoneNumber: '555-0000',
+                email: 'emergency@example.com'
+            },
             mustChangePassword: password === 'njyag'
         });
 
@@ -52,6 +59,9 @@ router.post('/register', async (req, res) => {
                 namePronunciation: user.namePronunciation,
                 phoneNumber: user.phoneNumber,
                 school: user.school,
+                foodAllergies: user.foodAllergies,
+                tshirtSize: user.tshirtSize,
+                emergencyContact: user.emergencyContact,
                 role: user.role,
                 createdAt: user.createdAt,
                 mustChangePassword: user.mustChangePassword,
@@ -100,6 +110,9 @@ router.post('/login', async (req, res) => {
                 namePronunciation: user.namePronunciation,
                 phoneNumber: user.phoneNumber,
                 school: user.school,
+                foodAllergies: user.foodAllergies,
+                tshirtSize: user.tshirtSize,
+                emergencyContact: user.emergencyContact,
                 role: user.role,
                 createdAt: user.createdAt,
                 mustChangePassword: user.mustChangePassword,
@@ -130,6 +143,9 @@ router.get('/me', auth, async (req, res) => {
                 namePronunciation: user.namePronunciation,
                 phoneNumber: user.phoneNumber,
                 school: user.school,
+                foodAllergies: user.foodAllergies,
+                tshirtSize: user.tshirtSize,
+                emergencyContact: user.emergencyContact,
                 role: user.role,
                 createdAt: user.createdAt,
                 mustChangePassword: user.mustChangePassword,
@@ -313,6 +329,9 @@ router.patch('/update-profile', auth, async (req, res) => {
                 namePronunciation: user.namePronunciation,
                 phoneNumber: user.phoneNumber,
                 school: user.school,
+                foodAllergies: user.foodAllergies,
+                tshirtSize: user.tshirtSize,
+                emergencyContact: user.emergencyContact,
                 role: user.role,
                 createdAt: user.createdAt,
                 mustChangePassword: user.mustChangePassword,
@@ -381,6 +400,9 @@ router.patch('/account', auth, async (req, res) => {
             namePronunciation,
             phoneNumber,
             school,
+            foodAllergies,
+            tshirtSize,
+            emergencyContact,
             oldPassword,
             newPassword,
             confirmPassword
@@ -412,10 +434,23 @@ router.patch('/account', auth, async (req, res) => {
         if (namePronunciation !== undefined) user.namePronunciation = namePronunciation;
         if (phoneNumber !== undefined) user.phoneNumber = phoneNumber;
         if (school !== undefined) user.school = school;
+        if (foodAllergies !== undefined) user.foodAllergies = foodAllergies;
+        if (tshirtSize !== undefined) user.tshirtSize = tshirtSize;
+        if (emergencyContact !== undefined) user.emergencyContact = emergencyContact;
 
         // Validate required fields
         if (!user.firstName || !user.lastName || !user.phoneNumber) {
             return res.status(400).json({ message: 'First name, last name, and phone number are required.' });
+        }
+
+        // Validate t-shirt size and emergency contact
+        if (!user.tshirtSize) {
+            return res.status(400).json({ message: 'T-shirt size is required.' });
+        }
+
+        if (!user.emergencyContact || !user.emergencyContact.name || !user.emergencyContact.relationship || 
+            !user.emergencyContact.phoneNumber || !user.emergencyContact.email) {
+            return res.status(400).json({ message: 'Complete emergency contact information is required.' });
         }
 
         // Mark profile as complete if all required fields are present
@@ -437,6 +472,9 @@ router.patch('/account', auth, async (req, res) => {
                 namePronunciation: user.namePronunciation,
                 phoneNumber: user.phoneNumber,
                 school: user.school,
+                foodAllergies: user.foodAllergies,
+                tshirtSize: user.tshirtSize,
+                emergencyContact: user.emergencyContact,
                 role: user.role,
                 createdAt: user.createdAt,
                 mustChangePassword: user.mustChangePassword,

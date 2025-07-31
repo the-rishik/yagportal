@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link, useLocation } from 'react-router-dom';
+import { Link, useLocation, useNavigate } from 'react-router-dom';
 import { motion } from 'framer-motion';
 import { useAuth } from '../contexts/AuthContext';
 import { apiService } from '../services/api';
@@ -11,6 +11,7 @@ import './Home.css';
 const Home: React.FC = () => {
   const { user } = useAuth();
   const location = useLocation();
+  const navigate = useNavigate();
   const [school, setSchool] = useState<School | null>(null);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState<string | null>(null);
@@ -204,23 +205,19 @@ const Home: React.FC = () => {
                     Welcome, <span className="gradient-text">{getUserDisplayName()}</span>
                   </h1>
                   <p className="advisor-subtitle">
-                    Your school has been approved!
+                    Your school has been approved
                   </p>
                   <div className="school-summary">
                     <div className="summary-header">
-                      <h3>{school.schoolName}</h3>
+                      <h3>Your School: {school.schoolName}</h3>
                       <button 
+                        onClick={() => setShowEditModal(true)}
                         className="edit-school-btn"
-                        onClick={() => {
-                          console.log('Edit button clicked!');
-                          console.log('Current showEditModal state:', showEditModal);
-                          console.log('School data:', school);
-                          setShowEditModal(true);
-                        }}
                       >
                         Edit School
                       </button>
                     </div>
+                    
                     <div className="summary-stats">
                       <div className="stat">
                         <span className="stat-number">{school.numberOfStudents}</span>
@@ -228,24 +225,19 @@ const Home: React.FC = () => {
                       </div>
                       <div className="stat">
                         <span className="stat-number">{school.people.length}</span>
-                        <span className="stat-label">Members</span>
-                      </div>
-                      <div className="stat">
-                        <span className="stat-number">
-                          {school.people.filter(p => p.type === 'advisor').length}
-                        </span>
-                        <span className="stat-label">Advisors</span>
+                        <span className="stat-label">Delegation Members</span>
                       </div>
                     </div>
+                    
                     <div className="school-members">
-                      <h4>School Members</h4>
+                      <h4>Delegation Members</h4>
                       <div className="members-list">
                         {school.people.map((person, index) => (
                           <div key={index} className="member">
                             <span className="member-name">{person.name}</span>
                             <span className="member-email">{person.email}</span>
                             <span className={`member-type ${person.type}`}>
-                              {person.type.charAt(0).toUpperCase() + person.type.slice(1)}
+                              {person.type === 'student' ? 'Student' : 'Advisor'}
                             </span>
                           </div>
                         ))}
@@ -255,22 +247,13 @@ const Home: React.FC = () => {
                 </motion.div>
               </div>
             </div>
-
             <DateCounter />
-            {/* Edit School Modal for Advisor */}
-            <EditSchoolModal
-              school={school}
-              isOpen={showEditModal}
-              onClose={() => setShowEditModal(false)}
-              onSave={handleEditSave}
-              isAdmin={false}
-            />
           </motion.div>
         );
       }
     }
 
-    // Show register school button if no school registered
+    // Show registration form for new advisors
     return (
       <motion.div 
         className="home-page"
@@ -290,111 +273,94 @@ const Home: React.FC = () => {
                 Welcome, <span className="gradient-text">{getUserDisplayName()}</span>
               </h1>
               <p className="advisor-subtitle">
-                Register your school to participate in NJYAG
+                You are registered as an advisor. You can register your school and manage your delegation.
               </p>
+              
               <div className="advisor-action">
-                <Link to="/register-school">
-                  <motion.button 
-                    className="btn btn-large register-school-btn"
-                    whileHover={{ scale: 1.05 }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    Register Your School
-                  </motion.button>
-                </Link>
+                <p>You haven't registered a school yet.</p>
+                <button 
+                  onClick={() => navigate('/register-school')}
+                  className="register-school-btn"
+                >
+                  Register Your School
+                </button>
               </div>
             </motion.div>
           </div>
         </div>
-
         <DateCounter />
-        {/* Edit School Modal for Advisor */}
-        <EditSchoolModal
-          school={school}
-          isOpen={showEditModal}
-          onClose={() => setShowEditModal(false)}
-          onSave={handleEditSave}
-          isAdmin={false}
-        />
       </motion.div>
     );
   }
 
-  // Original home page content for non-advisors
-  const containerVariants = {
-    hidden: { opacity: 0 },
-    visible: {
-      opacity: 1,
-      transition: {
-        duration: 0.6,
-        staggerChildren: 0.2
-      }
-    }
-  };
-
-  const itemVariants = {
-    hidden: { opacity: 0, y: 30 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: {
-        duration: 0.6
-      }
-    }
-  };
-
-  const cardVariants = {
-    hidden: { opacity: 0, scale: 0.9 },
-    visible: {
-      opacity: 1,
-      scale: 1,
-      transition: {
-        duration: 0.5
-      }
-    },
-    hover: {
-      scale: 1.05,
-      transition: {
-        duration: 0.2
-      }
-    }
-  };
-
-  const features = [
-    {
-      title: "Submit Bills",
-      description: "Create and submit legislative bills for consideration",
-      color: "var(--primary-500)"
-    },
-    {
-      title: "Collaborate",
-      description: "Work with other delegates and advisors",
-      color: "var(--success-500)"
-    },
-    {
-      title: "Admin Tools",
-      description: "Manage users and review submissions",
-      color: "var(--warning-500)"
-    },
-    {
-      title: "Track Progress",
-      description: "Monitor your bills through the legislative process",
-      color: "var(--error-500)"
-    }
-  ];
-
-  return (
-    <>
+  // If user is a student, show the student dashboard
+  if (user?.role === 'Student') {
+    return (
       <motion.div 
         className="home-page"
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.6 }}
+      >
+        <div className="hero-section">
+          <div className="container center-hero">
+            <div className="hero-content">
+              <motion.h1 
+                className="hero-title"
+                initial={{ opacity: 0, y: 50 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.2 }}
+              >
+                Welcome, <span className="gradient-text">{getUserDisplayName()}</span>
+              </motion.h1>
+              <motion.p 
+                className="hero-subtitle"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.4 }}
+              >
+                Welcome to the official platform for New Jersey Youth and Government. Submit your bills and track their progress.
+              </motion.p>
+              <motion.div 
+                className="hero-actions"
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.8, delay: 0.6 }}
+              >
+                <Link to="/bills" className="btn btn-primary">
+                  <span>View All Bills</span>
+                </Link>
+                <Link to="/my-bills" className="btn btn-secondary">
+                  <span>My Bill</span>
+                </Link>
+              </motion.div>
+            </div>
+          </div>
+        </div>
+        <DateCounter />
+      </motion.div>
+    );
+  }
+
+  // Default landing page for non-authenticated users
+  return (
+    <motion.div 
+      className="home-page"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 0.6 }}
+    >
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.8 }}
       >
         {/* Hero Section */}
         <motion.section 
           className="hero-section"
-          variants={itemVariants}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.2 }}
         >
           <div className="container center-hero">
             <div className="hero-content">
@@ -412,11 +378,7 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.4 }}
               >
-                {user && user.role === 'user' ? (
-                  'Welcome to the official platform for New Jersey Youth and Government. Submit your bills and track their progress.'
-                ) : (
-                  'The official platform for New Jersey Youth and Government. Please create an account or login to get started.'
-                )}
+                The official platform for New Jersey Youth and Government. Please create an account or login to get started.
               </motion.p>
               <motion.div 
                 className="hero-actions"
@@ -424,22 +386,12 @@ const Home: React.FC = () => {
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.8, delay: 0.6 }}
               >
-                {user && user.role === 'user' ? (
-                  <div className="flex gap-4">
-                    <Link to="/my-bills" className="btn btn-primary">
-                      <span>Submit Bill</span>
-                    </Link>
-                  </div>
-                ) : (
-                  <div className="flex gap-4">
-                    <Link to="/login" className="btn">
-                      <span>Login</span>
-                    </Link>
-                    <Link to="/register" className="btn btn-secondary">
-                      <span>Register</span>
-                    </Link>
-                  </div>
-                )}
+                <Link to="/login" className="btn">
+                  <span>Login</span>
+                </Link>
+                <Link to="/register" className="btn btn-secondary">
+                  <span>Register</span>
+                </Link>
               </motion.div>
             </div>
           </div>
@@ -448,10 +400,12 @@ const Home: React.FC = () => {
         {/* Date Counter Section */}
         <DateCounter />
 
-        {/* Stats Section (no features, no success rate) */}
+        {/* Stats Section */}
         <motion.section 
           className="stats-section"
-          variants={itemVariants}
+          initial={{ opacity: 0, y: 50 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.8, delay: 0.8 }}
         >
           <div className="container">
             <div className="stats-grid">
@@ -461,25 +415,52 @@ const Home: React.FC = () => {
                 <div style={{ color: 'red' }}>{statsError}</div>
               ) : stats ? (
                 <>
-                  <motion.div className="stat-card" variants={cardVariants}>
+                  <motion.div 
+                    className="stat-card"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 1.0 }}
+                  >
                     <div className="stat-value">{stats.activeBills}</div>
                     <div className="stat-label">Active Bills</div>
                   </motion.div>
-                  <motion.div className="stat-card" variants={cardVariants}>
+                  <motion.div 
+                    className="stat-card"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 1.2 }}
+                  >
                     <div className="stat-value">{stats.registeredUsers}</div>
                     <div className="stat-label">Registered Users</div>
                   </motion.div>
-                  <motion.div className="stat-card" variants={cardVariants}>
+                  <motion.div 
+                    className="stat-card"
+                    initial={{ opacity: 0, scale: 0.8 }}
+                    animate={{ opacity: 1, scale: 1 }}
+                    transition={{ duration: 0.6, delay: 1.4 }}
+                  >
                     <div className="stat-value">{stats.schools}</div>
-                    <div className="stat-label">Schools</div>
+                    <div className="stat-label">Participating Schools</div>
                   </motion.div>
                 </>
-              ) : null}
+              ) : (
+                <div>No stats available</div>
+              )}
             </div>
           </div>
         </motion.section>
       </motion.div>
-    </>
+
+      {/* Edit School Modal */}
+      {showEditModal && school && (
+        <EditSchoolModal
+          school={school}
+          isOpen={showEditModal}
+          onSave={handleEditSave}
+          onClose={() => setShowEditModal(false)}
+        />
+      )}
+    </motion.div>
   );
 };
 

@@ -152,9 +152,9 @@
   letter-spacing: 0.5px;
 }
 
-.role-user {
-  background-color: #e9ecef;
-  color: #495057;
+.role-student {
+  background-color: var(--success-100);
+  color: var(--success-700);
 }
 
 .role-advisor {

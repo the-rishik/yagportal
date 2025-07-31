@@ -50,8 +50,43 @@ const userSchema = new mongoose.Schema({
     },
     role: {
         type: String,
-        enum: ['user', 'advisor', 'staff', 'admin'],
-        default: 'user'
+        enum: ['Student', 'advisor', 'staff', 'admin'],
+        default: 'Student'
+    },
+    // New fields for additional information
+    foodAllergies: {
+        type: String,
+        required: false,
+        trim: true
+    },
+    tshirtSize: {
+        type: String,
+        enum: ['XS', 'S', 'M', 'L', 'XL', 'XXL', 'XXXL'],
+        required: true,
+        default: 'M'
+    },
+    emergencyContact: {
+        name: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        relationship: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        phoneNumber: {
+            type: String,
+            required: true,
+            trim: true
+        },
+        email: {
+            type: String,
+            required: true,
+            trim: true,
+            lowercase: true
+        }
     },
     createdAt: {
         type: Date,

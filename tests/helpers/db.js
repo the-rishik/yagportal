@@ -64,7 +64,7 @@ const createTestUser = async (userData = {}) => {
     firstName: 'Test',
     lastName: 'User',
     school: 'Test School',
-    role: 'user'
+    role: 'Student'
   };
 
   const user = new User({ ...defaultUser, ...userData });

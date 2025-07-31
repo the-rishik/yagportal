@@ -13,7 +13,7 @@ const AdminDashboard: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [showRoleModal, setShowRoleModal] = useState(false);
-  const [newRole, setNewRole] = useState<'user' | 'advisor' | 'staff' | 'admin'>('user');
+  const [newRole, setNewRole] = useState<'Student' | 'advisor' | 'staff' | 'admin'>('Student');
   const [schools, setSchools] = useState<any[]>([]);
 
   useEffect(() => {
@@ -47,7 +47,7 @@ const AdminDashboard: React.FC = () => {
       setUsers(users.map(u => u._id === selectedUser._id ? { ...u, role: newRole } : u));
       setShowRoleModal(false);
       setSelectedUser(null);
-      setNewRole('user');
+      setNewRole('Student');
     } catch (err) {
       setError('Failed to update user role');
       console.error('Error updating role:', err);
@@ -63,7 +63,7 @@ const AdminDashboard: React.FC = () => {
   const closeRoleModal = () => {
     setShowRoleModal(false);
     setSelectedUser(null);
-    setNewRole('user');
+    setNewRole('Student');
   };
 
   const handleApproveSchool = async (schoolId: string) => {
@@ -81,7 +81,7 @@ const AdminDashboard: React.FC = () => {
     switch (role) {
       case 'admin': return 'var(--error-500)';
       case 'advisor': return 'var(--warning-500)';
-      case 'user': return 'var(--success-500)';
+      case 'Student': return 'var(--success-500)';
       case 'staff': return 'var(--primary-500)';
       default: return 'var(--gray-500)';
     }
@@ -143,7 +143,7 @@ const AdminDashboard: React.FC = () => {
             </div>
             <div className="stat-card">
               <h3>Students</h3>
-              <p>{users.filter(u => u.role === 'user').length}</p>
+              <p>{users.filter(u => u.role === 'Student').length}</p>
             </div>
             <div className="stat-card">
               <h3>Pending Schools</h3>
@@ -309,9 +309,9 @@ const AdminDashboard: React.FC = () => {
                 <select 
                   id="role"
                   value={newRole}
-                  onChange={(e) => setNewRole(e.target.value as 'user' | 'advisor' | 'staff' | 'admin')}
+                  onChange={(e) => setNewRole(e.target.value as 'Student' | 'advisor' | 'staff' | 'admin')}
                 >
-                  <option value="user">Student</option>
+                  <option value="Student">Student</option>
                   <option value="advisor">Advisor</option>
                   <option value="staff">Staff</option>
                   <option value="admin">Admin</option>

@@ -21,6 +21,14 @@ const Account: React.FC = () => {
   const [namePronunciation, setNamePronunciation] = useState('');
   const [phoneNumber, setPhoneNumber] = useState('');
   
+  // New fields state
+  const [foodAllergies, setFoodAllergies] = useState('');
+  const [tshirtSize, setTshirtSize] = useState<'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL'>('M');
+  const [emergencyContactName, setEmergencyContactName] = useState('');
+  const [emergencyContactRelationship, setEmergencyContactRelationship] = useState('');
+  const [emergencyContactPhone, setEmergencyContactPhone] = useState('');
+  const [emergencyContactEmail, setEmergencyContactEmail] = useState('');
+  
   // Form state
   const [loading, setLoading] = useState(false);
   const [success, setSuccess] = useState('');
@@ -35,6 +43,12 @@ const Account: React.FC = () => {
       setPronouns(user.pronouns || '');
       setNamePronunciation(user.namePronunciation || '');
       setPhoneNumber(user.phoneNumber || '');
+      setFoodAllergies(user.foodAllergies || '');
+      setTshirtSize(user.tshirtSize || 'M');
+      setEmergencyContactName(user.emergencyContact?.name || '');
+      setEmergencyContactRelationship(user.emergencyContact?.relationship || '');
+      setEmergencyContactPhone(user.emergencyContact?.phoneNumber || '');
+      setEmergencyContactEmail(user.emergencyContact?.email || '');
       
       // Set old password to 'njyag' if user must change password
       if (user.mustChangePassword) {
@@ -49,13 +63,21 @@ const Account: React.FC = () => {
     setError('');
     setLoading(true);
     try {
-      const result = await apiService.updateAccount({
+      await apiService.updateAccount({
         firstName,
         lastName,
         middleName,
         pronouns,
         namePronunciation,
-        phoneNumber
+        phoneNumber,
+        foodAllergies,
+        tshirtSize: tshirtSize || 'M',
+        emergencyContact: {
+          name: emergencyContactName || 'Emergency Contact',
+          relationship: emergencyContactRelationship || 'Emergency Contact',
+          phoneNumber: emergencyContactPhone || '555-0000',
+          email: emergencyContactEmail || 'emergency@example.com'
+        }
       });
       setSuccess('Profile updated successfully.');
       
@@ -174,6 +196,81 @@ const Account: React.FC = () => {
             />
           </div>
           
+          <div className="form-group">
+            <label>Food Allergies (Optional)</label>
+            <textarea
+              value={foodAllergies}
+              onChange={e => setFoodAllergies(e.target.value)}
+              placeholder="List any food allergies or dietary restrictions..."
+              rows={3}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>T-Shirt Size *</label>
+            <select
+              value={tshirtSize}
+              onChange={e => setTshirtSize(e.target.value as any)}
+              required
+            >
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="XXXL">XXXL</option>
+            </select>
+          </div>
+          
+          <div className="emergency-contact-section">
+            <h4>Emergency Contact Information *</h4>
+            
+            <div className="form-group">
+              <label>Emergency Contact Name *</label>
+              <input
+                type="text"
+                value={emergencyContactName}
+                onChange={e => setEmergencyContactName(e.target.value)}
+                placeholder="Full name"
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Relationship *</label>
+              <input
+                type="text"
+                value={emergencyContactRelationship}
+                onChange={e => setEmergencyContactRelationship(e.target.value)}
+                placeholder="e.g., Parent, Spouse, Friend"
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Emergency Contact Phone *</label>
+              <input
+                type="tel"
+                value={emergencyContactPhone}
+                onChange={e => setEmergencyContactPhone(e.target.value)}
+                placeholder="Phone number"
+                required
+              />
+            </div>
+            
+            <div className="form-group">
+              <label>Emergency Contact Email *</label>
+              <input
+                type="email"
+                value={emergencyContactEmail}
+                onChange={e => setEmergencyContactEmail(e.target.value)}
+                placeholder="Email address"
+                required
+              />
+            </div>
+          </div>
+          
           <button type="submit" className="btn btn-primary" disabled={loading}>
             {loading ? 'Updating...' : 'Complete Profile'}
           </button>
@@ -241,6 +338,19 @@ const Account: React.FC = () => {
         <p><strong>School:</strong> {user?.school}</p>
         {user?.pronouns && <p><strong>Pronouns:</strong> {user.pronouns}</p>}
         {user?.namePronunciation && <p><strong>Name Pronunciation:</strong> {user.namePronunciation}</p>}
+        {user?.foodAllergies && <p><strong>Food Allergies:</strong> {user.foodAllergies}</p>}
+        {user?.tshirtSize && <p><strong>T-Shirt Size:</strong> {user.tshirtSize}</p>}
+        {user?.emergencyContact && (
+          <div className="emergency-contact-info">
+            <p><strong>Emergency Contact:</strong></p>
+            <ul>
+              {user.emergencyContact.name && <li><strong>Name:</strong> {user.emergencyContact.name}</li>}
+              {user.emergencyContact.relationship && <li><strong>Relationship:</strong> {user.emergencyContact.relationship}</li>}
+              {user.emergencyContact.phoneNumber && <li><strong>Phone:</strong> {user.emergencyContact.phoneNumber}</li>}
+              {user.emergencyContact.email && <li><strong>Email:</strong> {user.emergencyContact.email}</li>}
+            </ul>
+          </div>
+        )}
       </div>
       
       <div className="update-profile-section">
@@ -309,6 +419,85 @@ const Account: React.FC = () => {
                 onChange={e => setNamePronunciation(e.target.value)}
                 placeholder="e.g., REE-shik"
               />
+            </div>
+          </div>
+          
+          <div className="form-group">
+            <label>Food Allergies (Optional)</label>
+            <textarea
+              value={foodAllergies}
+              onChange={e => setFoodAllergies(e.target.value)}
+              placeholder="List any food allergies or dietary restrictions..."
+              rows={3}
+            />
+          </div>
+          
+          <div className="form-group">
+            <label>T-Shirt Size *</label>
+            <select
+              value={tshirtSize}
+              onChange={e => setTshirtSize(e.target.value as any)}
+              required
+            >
+              <option value="XS">XS</option>
+              <option value="S">S</option>
+              <option value="M">M</option>
+              <option value="L">L</option>
+              <option value="XL">XL</option>
+              <option value="XXL">XXL</option>
+              <option value="XXXL">XXXL</option>
+            </select>
+          </div>
+          
+          <div className="emergency-contact-section">
+            <h4>Emergency Contact Information *</h4>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Emergency Contact Name *</label>
+                <input
+                  type="text"
+                  value={emergencyContactName}
+                  onChange={e => setEmergencyContactName(e.target.value)}
+                  placeholder="Full name"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Relationship *</label>
+                <input
+                  type="text"
+                  value={emergencyContactRelationship}
+                  onChange={e => setEmergencyContactRelationship(e.target.value)}
+                  placeholder="e.g., Parent, Spouse, Friend"
+                  required
+                />
+              </div>
+            </div>
+            
+            <div className="form-row">
+              <div className="form-group">
+                <label>Emergency Contact Phone *</label>
+                <input
+                  type="tel"
+                  value={emergencyContactPhone}
+                  onChange={e => setEmergencyContactPhone(e.target.value)}
+                  placeholder="Phone number"
+                  required
+                />
+              </div>
+              
+              <div className="form-group">
+                <label>Emergency Contact Email *</label>
+                <input
+                  type="email"
+                  value={emergencyContactEmail}
+                  onChange={e => setEmergencyContactEmail(e.target.value)}
+                  placeholder="Email address"
+                  required
+                />
+              </div>
             </div>
           </div>
           

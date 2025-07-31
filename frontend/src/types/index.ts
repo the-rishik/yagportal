@@ -7,8 +7,16 @@ export interface User {
   pronouns?: string;
   namePronunciation?: string;
   phoneNumber: string;
-  role: 'user' | 'advisor' | 'staff' | 'admin';
+  role: 'Student' | 'advisor' | 'staff' | 'admin';
   school?: string;
+  foodAllergies?: string;
+  tshirtSize: 'XS' | 'S' | 'M' | 'L' | 'XL' | 'XXL' | 'XXXL';
+  emergencyContact: {
+    name: string;
+    relationship: string;
+    phoneNumber: string;
+    email: string;
+  };
   createdAt: string;
   updatedAt: string;
   mustChangePassword?: boolean;
@@ -19,6 +27,7 @@ export interface Bill {
   _id: string;
   title: string;
   content: string;
+  enactmentClause: string;
   author: {
     _id: string;
     firstName: string;
@@ -71,11 +80,12 @@ export interface RegisterData {
 export interface BillFormData {
   title: string;
   content: string;
-  category: 'education' | 'environment' | 'health' | 'public_safety' | 'other';
+  enactmentClause: string;
+  category: 'civil_rights' | 'finance' | 'human_rights' | 'education';
 }
 
 export interface RoleChangeRequest {
-  role: 'user' | 'advisor' | 'staff' | 'admin';
+  role: 'Student' | 'advisor' | 'staff' | 'admin';
 }
 
 export interface ApiResponse<T> {

@@ -101,7 +101,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
   const isAdmin = user?.role === 'admin';
   const isAdvisor = user?.role === 'advisor';
   const isStaff = user?.role === 'staff';
-  const isStudent = user?.role === 'user';
+  const isStudent = user?.role === 'Student';
   const hasStudentAccess = isStudent || isAdvisor || isStaff; // Advisors and staff have same access as students
 
   const value: AuthContextType = {

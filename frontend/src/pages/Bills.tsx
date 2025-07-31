@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../contexts/AuthContext';
 import apiService from '../services/api';
 import { Bill } from '../types';
@@ -7,6 +8,7 @@ import './Bills.css';
 
 const Bills: React.FC = () => {
   const { user } = useAuth();
+  const navigate = useNavigate();
   const [bills, setBills] = useState<Bill[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -18,12 +20,11 @@ const Bills: React.FC = () => {
   const [showModal, setShowModal] = useState(false);
 
   const categories = [
-    { value: 'all', label: 'All Categories' },
-    { value: 'education', label: 'Education' },
-    { value: 'environment', label: 'Environment' },
-    { value: 'health', label: 'Health' },
-    { value: 'public_safety', label: 'Public Safety' },
-    { value: 'other', label: 'Other' }
+    { value: 'all', label: 'All Topics' },
+    { value: 'civil_rights', label: 'Civil Rights' },
+    { value: 'finance', label: 'Finance' },
+    { value: 'human_rights', label: 'Human Rights' },
+    { value: 'education', label: 'Education' }
   ];
 
   const statuses = [
@@ -108,6 +109,12 @@ const Bills: React.FC = () => {
               Browse and search through all submitted legislative bills
             </p>
           </div>
+          
+          {user && (
+            <button className="btn create-bill-btn" onClick={() => navigate('/create-bill')}>
+              <span>Create Bill</span>
+            </button>
+          )}
         </div>
 
         {/* Search and Filters */}
@@ -142,7 +149,7 @@ const Bills: React.FC = () => {
               transition={{ duration: 0.3, ease: "easeInOut" }}
             >
               <div className="filter-group">
-                <label className="filter-label">Category</label>
+                <label className="filter-label">Topic</label>
                 <select
                   value={selectedCategory}
                   onChange={(e) => setSelectedCategory(e.target.value)}
@@ -293,6 +300,9 @@ const Bills: React.FC = () => {
                 <div className="bill-content">
                   <h3>Bill Content</h3>
                   <p>{selectedBill.content}</p>
+                  
+                  <h3>Enactment Clause</h3>
+                  <p>{selectedBill.enactmentClause}</p>
                 </div>
               </div>
             </motion.div>

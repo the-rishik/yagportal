@@ -97,6 +97,19 @@
   display: block;
 }
 
+.form-group label:has(+ input[required]),
+.form-group label:has(+ select[required]),
+.form-group label:has(+ textarea[required]) {
+  color: #dc2626;
+}
+
+.form-group label:has(+ input[required])::after,
+.form-group label:has(+ select[required])::after,
+.form-group label:has(+ textarea[required])::after {
+  content: " *";
+  color: #dc2626;
+}
+
 .form-group input[type="password"] {
   width: 100%;
   padding: 0.75rem;
@@ -192,4 +205,99 @@
   outline: none;
   border-color: #6366f1;
   background: #fff;
+}
+
+/* New sections styling */
+.emergency-contact-section {
+  background: #f8fafc;
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 1.5rem;
+  margin-top: 1rem;
+}
+
+.emergency-contact-section h4 {
+  font-size: 1.125rem;
+  font-weight: 600;
+  color: #1e293b;
+  margin-bottom: 1rem;
+  margin-top: 0;
+}
+
+.emergency-contact-info {
+  margin-top: 0.5rem;
+}
+
+.emergency-contact-info ul {
+  list-style: none;
+  padding: 0;
+  margin: 0.5rem 0 0 0;
+}
+
+.emergency-contact-info li {
+  margin: 0.25rem 0;
+  color: #374151;
+}
+
+.form-group textarea {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #f9fafb;
+  color: #111;
+  font-family: inherit;
+  resize: vertical;
+  min-height: 80px;
+}
+
+.form-group textarea:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+}
+
+.form-group select {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #f9fafb;
+  color: #111;
+  cursor: pointer;
+}
+
+.form-group select:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+}
+
+.form-group input[type="email"] {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1.5px solid #d1d5db;
+  border-radius: 0.5rem;
+  font-size: 1rem;
+  background: #f9fafb;
+  color: #111;
+}
+
+.form-group input[type="email"]:focus {
+  outline: none;
+  border-color: #6366f1;
+  background: #fff;
+}
+
+/* Responsive design for new sections */
+@media (max-width: 768px) {
+  .emergency-contact-section {
+    padding: 1rem;
+  }
+  
+  .form-row {
+    grid-template-columns: 1fr;
+  }
 } 
